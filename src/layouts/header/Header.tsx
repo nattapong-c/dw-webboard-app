@@ -18,13 +18,13 @@ export default function Header(props: HeaderProp) {
 
   return (
     <>
-      <div className="bg-main-color py-[15px] px-[20px] flex justify-between fixed w-full">
+      <div className="bg-main-color py-[15px] px-[20px] flex justify-between fixed w-full z-50">
         <div>
           <h1 className="text-white font-castoro italic text-24">a Board</h1>
         </div>
         <div>
           <div className="max-md:hidden">
-            <Button label="Sign in" />
+            <Button label="Sign in" confirm />
           </div>
           <div className="md:hidden">
             <button

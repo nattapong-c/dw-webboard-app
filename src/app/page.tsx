@@ -10,6 +10,7 @@ import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
 import { CommunityType } from "@/typing/post";
 import { useState } from "react";
+// import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 const posts = [
   {
@@ -73,6 +74,19 @@ export default function Home() {
   const [selectedCommunityCreate, setSelectedCommunityCreate] =
     useState(undefined);
   const [openCreate, setOpenCreate] = useState(false);
+  // const [focusSearch, setFocusSearch] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+
+  const handleUpdatePost = () => {
+    setOpenUpdate(true);
+    // TODO fill form
+    // TODO reset form
+  };
+
+  const handleDeletePost = () => {
+    setOpenDelete(true);
+  };
 
   return (
     <main>
@@ -84,7 +98,18 @@ export default function Home() {
         <div className="md:w-8/12 max-md:w-full">
           <div>
             <form className="flex">
-              <TextInput placeholder="search" transparentBackground />
+              {/* <button
+                className={focusSearch ? "hidden" : ""}
+                type="button"
+                onClick={() => setFocusSearch(true)}
+              >
+                <MagnifyingGlassIcon className="size-6" />
+              </button> */}
+              <TextInput
+                placeholder="search"
+                transparentBackground
+                // onBlur={() => setFocusSearch(false)}
+              />
               <div>
                 <CommunityDropdown
                   selected={selectedCommunity}
@@ -100,7 +125,11 @@ export default function Home() {
                 />
               </div>
               <div className="max-md:w-1/3 md:w-1/4">
-                <Button label="Create+" onClick={() => setOpenCreate(true)} />
+                <Button
+                  label="Create+"
+                  confirm
+                  onClick={() => setOpenCreate(true)}
+                />
               </div>
             </form>
           </div>
@@ -117,6 +146,9 @@ export default function Home() {
                   user: post.user,
                   created_at: post.created_at,
                 }}
+                allowAction
+                onUpdate={() => handleUpdatePost()}
+                onDelete={() => handleDeletePost()}
               />
             ))}
           </div>
@@ -126,7 +158,7 @@ export default function Home() {
                 <div className="mb-[10px] md:w-fit">
                   <CommunityDropdown
                     border
-                    title="Choose a community"
+                    title={selectedCommunityCreate ?? "Choose a community"}
                     titleCenter
                     createMode
                     selected={selectedCommunityCreate}
@@ -159,10 +191,76 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <Button label="Post" submit />
+                    <Button label="Post" confirm submit />
                   </div>
                 </div>
               </form>
+            </Modal>
+          )}
+          {openUpdate && (
+            <Modal title="Edit Post" onClose={() => setOpenUpdate(false)}>
+              <form>
+                <div className="mb-[10px] md:w-fit">
+                  <CommunityDropdown
+                    border
+                    title={selectedCommunityCreate ?? "Choose a community"}
+                    titleCenter
+                    createMode
+                    selected={selectedCommunityCreate}
+                    openOptions={openCommunityCreate}
+                    onToggle={() =>
+                      setOpenCommunityCreate(!openCommunityCreate)
+                    }
+                    onSelect={(e) => {
+                      if (
+                        e.target.innerHTML.includes(selectedCommunityCreate)
+                      ) {
+                        setSelectedCommunityCreate(undefined);
+                      } else {
+                        setSelectedCommunityCreate(e.target.innerHTML);
+                      }
+                    }}
+                  />
+                </div>
+                <TextInput placeholder="Title" />
+                <div className="mt-[10px]">
+                  <TextArea placeholder="What's on your mind..." />
+                </div>
+
+                <div className="mt-[20px] md:flex md:justify-end">
+                  <div className="max-md:mb-[15px] md:mr-[10px]">
+                    <Button
+                      label="Cancel"
+                      outline
+                      onClick={() => setOpenUpdate(false)}
+                    />
+                  </div>
+                  <div>
+                    <Button label="Confirm" confirm submit />
+                  </div>
+                </div>
+              </form>
+            </Modal>
+          )}
+          {openDelete && (
+            <Modal
+              title="Please comfirm if you wish to delete the post"
+              titleCenter
+              subtitle="Are you sure you want to delete the post? Once deleted, it cannot be recovered."
+              onClose={() => setOpenDelete(false)}
+            >
+              <div className="md:flex md:justify-end">
+                <div className="max-md:mb-[15px] md:order-last">
+                  <Button label="Delete" submit danger />
+                </div>
+                <div className="md:mr-[10px]">
+                  <Button
+                    label="Cancel"
+                    outline
+                    onClick={() => setOpenDelete(false)}
+                  />
+                </div>
+              </div>
             </Modal>
           )}
         </div>

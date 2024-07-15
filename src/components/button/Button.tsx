@@ -2,6 +2,7 @@ interface ButtonProp {
   label: string;
   outline?: boolean;
   danger?: boolean;
+  confirm?: boolean;
   submit?: boolean;
 
   onClick?: () => void;
@@ -12,14 +13,18 @@ export default function Button(props: ButtonProp) {
   if (props.outline) {
     if (props.danger) {
       classes += " border-2 border-danger-color text-danger-color";
-    } else {
+    } else if (props.confirm) {
       classes += " border-2 border-confirm-color text-confirm-color";
+    } else {
+      classes += " border-2";
     }
   } else {
     if (props.danger) {
       classes += " border-2 border-danger-color bg-danger-color text-white";
-    } else {
+    } else if (props.confirm) {
       classes += " border-2 border-confirm-color bg-confirm-color text-white";
+    } else {
+      classes += " border-2";
     }
   }
 

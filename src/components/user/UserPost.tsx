@@ -23,7 +23,9 @@ export default function UserPost(props: UserPostProp) {
       )}
 
       <p className="ml-[20px]">{props.user.username}</p>
-      <p className="text-gray-300 ml-[10px]">{dayjs().to(props.date)}</p>
+      <p className="text-gray-300 ml-[10px] max-md:text-[12px]">
+        {dayjs().to(props.date)}
+      </p>
     </div>
   );
 }

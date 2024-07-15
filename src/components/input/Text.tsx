@@ -1,6 +1,7 @@
 interface TextInputProp {
   placeholder: string;
   transparentBackground?: boolean;
+  onBlur?: () => void;
 }
 
 export default function TextInput(props: TextInputProp) {
@@ -12,6 +13,7 @@ export default function TextInput(props: TextInputProp) {
           props.transparentBackground ? "bg-transparent" : ""
         }`}
         placeholder={props.placeholder}
+        onBlur={props.onBlur ? props.onBlur : undefined}
       />
     </>
   );

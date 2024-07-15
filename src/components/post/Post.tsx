@@ -1,5 +1,9 @@
 import { Post as PostType } from "@/typing/post";
-import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
+import {
+  ChatBubbleOvalLeftIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import UserPost from "../user/UserPost";
@@ -9,13 +13,34 @@ dayjs.extend(relativeTime);
 interface PostProp {
   post: PostType;
   detail?: boolean;
+  allowAction?: boolean;
+  onUpdate?: () => void;
+  onDelete?: () => void;
 }
 
 export default function Post(props: PostProp) {
   return (
     <>
       <div className={`p-[20px] ${props.detail ? "" : "bg-white border-b-2"} `}>
-        <UserPost user={props.post.user} date={props.post.created_at} />
+        <div className={props.allowAction ? "flex justify-between" : ""}>
+          <UserPost user={props.post.user} date={props.post.created_at} />
+          {props.allowAction && (
+            <div className="flex mt-[3px]">
+              <button
+                type="button"
+                onClick={props.onUpdate ? props.onUpdate : undefined}
+              >
+                <PencilIcon className="size-6" />
+              </button>
+              <button
+                type="button"
+                onClick={props.onDelete ? props.onDelete : undefined}
+              >
+                <TrashIcon className="size-6 ml-[20px]" />
+              </button>
+            </div>
+          )}
+        </div>
         <div className="mt-[15px]">
           <div className="rounded-full text-gray-4a bg-gray-f3 text-center w-fit px-[12px] py-[5px]">
             <p>{props.post.community}</p>

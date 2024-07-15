@@ -80,6 +80,7 @@ export default function PostDetail() {
             <Button
               label="Add Comments"
               outline
+              confirm
               onClick={() => setOpenModal(true)}
             />
           </div>
@@ -88,6 +89,7 @@ export default function PostDetail() {
               <Button
                 label="Add Comments"
                 outline
+                confirm
                 onClick={() => setOpenTextArea(true)}
               />
             </div>
@@ -106,7 +108,7 @@ export default function PostDetail() {
                     />
                   </div>
                   <div>
-                    <Button label="Post" submit />
+                    <Button label="Post" confirm submit />
                   </div>
                 </form>
               </Modal>
@@ -125,7 +127,7 @@ export default function PostDetail() {
                     />
                   </div>
                   <div>
-                    <Button label="Post" submit />
+                    <Button label="Post" confirm submit />
                   </div>
                 </div>
               </form>

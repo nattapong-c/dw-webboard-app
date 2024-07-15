@@ -14,7 +14,7 @@ export default function Login() {
             <form>
               <TextInput placeholder="username" />
               <div className="mt-[15px]">
-                <Button label="Sign in" />
+                <Button label="Sign in" confirm />
               </div>
             </form>
           </div>

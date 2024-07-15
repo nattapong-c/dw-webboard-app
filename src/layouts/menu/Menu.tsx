@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/button/Button";
 import { HomeIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 
 enum MenuEnum {
@@ -47,6 +48,11 @@ export default function MainMenu(props: MenuProp) {
           </a>
         </li>
       </ul>
+      {!props.desktop && (
+        <div className="mt-[30px]">
+          <Button label="Sign in" confirm />
+        </div>
+      )}
     </>
   );
 }
