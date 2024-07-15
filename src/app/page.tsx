@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/button/Button";
-import TextOutlineInput from "@/components/input/TextOutline";
+import TextInput from "@/components/input/Text";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
@@ -73,7 +73,7 @@ export default function Home() {
         <div className="md:w-2/4 max-md:w-full">
           <div>
             <form className="flex">
-              <TextOutlineInput placeholder="search" />
+              <TextInput placeholder="search" transparentBackground />
               <div>dropdown</div>
               <div className="max-md:w-1/3 md:w-1/4">
                 <Button label="Create+" />

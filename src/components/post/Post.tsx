@@ -1,5 +1,5 @@
 import { Post as PostType } from "@/typing/post";
-import { ChatBubbleOvalLeftIcon, UserIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import UserPost from "../user/UserPost";

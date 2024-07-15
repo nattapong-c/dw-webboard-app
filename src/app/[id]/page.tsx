@@ -2,11 +2,14 @@
 
 import Button from "@/components/button/Button";
 import Comment from "@/components/comment/Comment";
+import TextArea from "@/components/input/TextArea";
+import Modal from "@/components/modal/Modal";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
 import { CommunityType } from "@/typing/post";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
 
 const post = {
   _id: "1",
@@ -41,6 +44,9 @@ const post = {
 };
 
 export default function PostDetail() {
+  const [openModal, setOpenModal] = useState(false);
+  const [openTextArea, setOpenTextArea] = useState(false);
+
   return (
     <main>
       <Header menu="Home" />
@@ -70,9 +76,63 @@ export default function PostDetail() {
               }}
             />
           </div>
-          <div className="w-fit px-[20px] mt-[20px]">
-            <Button label="Add Comments" outline />
+          <div className="w-fit px-[20px] mt-[20px] md:hidden">
+            <Button
+              label="Add Comments"
+              outline
+              onClick={() => setOpenModal(true)}
+            />
           </div>
+          {!openTextArea && (
+            <div className="w-fit px-[20px] mt-[20px] max-md:hidden">
+              <Button
+                label="Add Comments"
+                outline
+                onClick={() => setOpenTextArea(true)}
+              />
+            </div>
+          )}
+
+          {openModal && (
+            <div className="md:hidden">
+              <Modal title="Add Comments" onClose={() => setOpenModal(false)}>
+                <form>
+                  <TextArea placeholder="What's on your mind..." />
+                  <div className="mt-[20px] mb-[15px]">
+                    <Button
+                      label="Cancel"
+                      outline
+                      onClick={() => setOpenModal(false)}
+                    />
+                  </div>
+                  <div>
+                    <Button label="Post" submit />
+                  </div>
+                </form>
+              </Modal>
+            </div>
+          )}
+          {openTextArea && (
+            <div className="max-md:hidden px-[20px]">
+              <form>
+                <TextArea placeholder="What's on your mind..." />
+                <div className="mt-[20px] flex justify-end">
+                  <div className="flex justify-end">
+                    <div className="mr-[10px]">
+                      <Button
+                        label="Cancel"
+                        outline
+                        onClick={() => setOpenTextArea(false)}
+                      />
+                    </div>
+                    <div>
+                      <Button label="Post" submit />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          )}
           <div className="px-[20px] mt-[30px]">
             {post.comments?.map((comment) => (
               <Comment key={comment._id} comment={comment} />
