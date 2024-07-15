@@ -17,3 +17,9 @@ export interface Post {
     comments?: Comment[];
     created_at: Date;
 }
+
+export interface PostPagination {
+    posts: Post[];
+    total_page: number;
+    total_item: number;
+}

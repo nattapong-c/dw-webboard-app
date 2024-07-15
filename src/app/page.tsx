@@ -4,72 +4,74 @@ import Button from "@/components/button/Button";
 import CommunityDropdown from "@/components/dropdown/Community";
 import TextInput from "@/components/input/Text";
 import TextArea from "@/components/input/TextArea";
+import Loader from "@/components/loader/Loader";
 import Modal from "@/components/modal/Modal";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
-import { Auth } from "@/services";
-import { CommunityType } from "@/typing/post";
+import { Auth, Post as PostService } from "@/services";
+import { CommunityType, Post as PostType } from "@/typing/post";
 import { User } from "@/typing/user";
 import { Utils } from "@/utils";
+import { useDebounce } from "@/utils/debounce";
 import { useEffect, useState } from "react";
 // import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-const posts = [
-  {
-    _id: "1",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "History",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture:
-        "https://scontent.fkdt3-1.fna.fbcdn.net/v/t39.30808-6/439895622_298237006662240_1963575465128457687_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF8hyEB2oU_QBcibnZMSY08wsJTGi0fVrjCwlMaLR9WuGe1HQ0-pj-8XvzMs_g7cGxWmOqpzZSqTYmexn05vC9K&_nc_ohc=cq_XMG_-LGkQ7kNvgEVycnA&_nc_ht=scontent.fkdt3-1.fna&oh=00_AYA0tvSunD8_T4kz0Yffmft2fLOJC_UAsPtwENdHek4XMw&oe=669B1FB7",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-  {
-    _id: "2",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "History",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture: "",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-  {
-    _id: "3",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "History",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture: "",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-  {
-    _id: "4",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "Exercise",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture: "",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-];
+// const posts = [
+//   {
+//     _id: "1",
+//     topic: "The Big Short War",
+//     content:
+//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
+//     community: "History",
+//     comment_count: 32,
+//     user: {
+//       username: "Wieee",
+//       picture:
+//         "https://scontent.fkdt3-1.fna.fbcdn.net/v/t39.30808-6/439895622_298237006662240_1963575465128457687_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF8hyEB2oU_QBcibnZMSY08wsJTGi0fVrjCwlMaLR9WuGe1HQ0-pj-8XvzMs_g7cGxWmOqpzZSqTYmexn05vC9K&_nc_ohc=cq_XMG_-LGkQ7kNvgEVycnA&_nc_ht=scontent.fkdt3-1.fna&oh=00_AYA0tvSunD8_T4kz0Yffmft2fLOJC_UAsPtwENdHek4XMw&oe=669B1FB7",
+//     },
+//     created_at: new Date("2024-03-09"),
+//   },
+//   {
+//     _id: "2",
+//     topic: "The Big Short War",
+//     content:
+//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
+//     community: "History",
+//     comment_count: 32,
+//     user: {
+//       username: "Wieee",
+//       picture: "",
+//     },
+//     created_at: new Date("2024-03-09"),
+//   },
+//   {
+//     _id: "3",
+//     topic: "The Big Short War",
+//     content:
+//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
+//     community: "History",
+//     comment_count: 32,
+//     user: {
+//       username: "Wieee",
+//       picture: "",
+//     },
+//     created_at: new Date("2024-03-09"),
+//   },
+//   {
+//     _id: "4",
+//     topic: "The Big Short War",
+//     content:
+//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
+//     community: "Exercise",
+//     comment_count: 32,
+//     user: {
+//       username: "Wieee",
+//       picture: "",
+//     },
+//     created_at: new Date("2024-03-09"),
+//   },
+// ];
 
 export default function Home() {
   const [openCommunity, setOpenCommunity] = useState(false);
@@ -78,8 +80,12 @@ export default function Home() {
   const [selectedCommunityCreate, setSelectedCommunityCreate] =
     useState(undefined);
   const [openCreate, setOpenCreate] = useState(false);
+  const [search, setSearch] = useState("");
   // const [focusSearch, setFocusSearch] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [posts, setPost] = useState<PostType[]>([]);
+  const [loadingPost, setLoadingPost] = useState(false);
+  const debouncedSearch = useDebounce(search, 1500);
 
   const getMe = async () => {
     const userLocal = Utils.getUserLocal();
@@ -104,9 +110,27 @@ export default function Home() {
     }
   };
 
+  const listPost = async (community?: string, topic?: string) => {
+    setLoadingPost(true);
+    const results = await PostService.list(community, topic);
+    setPost(results || []);
+    setLoadingPost(false);
+  };
+
   useEffect(() => {
     getMe();
+    listPost();
   }, []);
+
+  useEffect(() => {
+    listPost(selectedCommunity, search);
+  }, [selectedCommunity]);
+
+  useEffect(() => {
+    if (debouncedSearch) {
+      listPost(selectedCommunity, debouncedSearch);
+    }
+  }, [debouncedSearch]);
 
   return (
     <main>
@@ -117,7 +141,7 @@ export default function Home() {
         </div>
         <div className="md:w-8/12 max-md:w-full">
           <div>
-            <form className="flex">
+            <div className="flex">
               {/* <button
                 className={focusSearch ? "hidden" : ""}
                 type="button"
@@ -128,7 +152,7 @@ export default function Home() {
               <TextInput
                 placeholder="search"
                 transparentBackground
-                // onBlur={() => setFocusSearch(false)}
+                onChange={(event) => setSearch(event.target.value)}
               />
               <div>
                 <CommunityDropdown
@@ -151,10 +175,11 @@ export default function Home() {
                   onClick={() => setOpenCreate(true)}
                 />
               </div>
-            </form>
+            </div>
           </div>
           <div className="mt-[15px] rounded-lg bg-white p-[2px]">
-            {posts.map((post) => (
+            {loadingPost && <Loader />}
+            {posts?.map((post) => (
               <Post
                 key={post._id}
                 post={{
