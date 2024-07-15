@@ -2,9 +2,22 @@
 
 import Button from "@/components/button/Button";
 import { useState } from "react";
-import { ArrowRightIcon, Bars3Icon } from "@heroicons/react/24/solid";
+import {
+  ArrowRightIcon,
+  Bars3Icon,
+  HomeIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/solid";
 
-export default function Header() {
+enum Menu {
+  "Home",
+  "OurBlog",
+}
+interface HeaderProp {
+  menu: keyof typeof Menu;
+}
+
+export default function Header(props: HeaderProp) {
   const [openMenu, setOpenMenu] = useState(false);
 
   return (
@@ -40,14 +53,27 @@ export default function Header() {
               </li>
               <li>
                 <a
-                  className="text-sm text-white font-bold hover:font-bold"
+                  className={
+                    props.menu === "Home"
+                      ? "text-sm text-white font-bold hover:font-bold flex"
+                      : "text-sm text-white hover:font-bold flex"
+                  }
                   href="#"
                 >
+                  <HomeIcon className="size-6 text-white mr-[15px]" />
                   Home
                 </a>
               </li>
               <li className="pt-[10px]">
-                <a className="text-sm text-white" href="#">
+                <a
+                  className={
+                    props.menu === "OurBlog"
+                      ? "text-sm text-white font-bold hover:font-bold flex"
+                      : "text-sm text-white hover:font-bold flex"
+                  }
+                  href="#"
+                >
+                  <PencilSquareIcon className="size-6 text-white mr-[15px]" />
                   Our Blog
                 </a>
               </li>
