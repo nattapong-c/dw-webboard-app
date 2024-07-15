@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/button/Button";
+import Comment from "@/components/comment/Comment";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
@@ -19,6 +20,24 @@ const post = {
     picture: "",
   },
   created_at: new Date("2024-03-09"),
+  comments: [
+    {
+      _id: "11",
+      message: "Lorem ipsum dolor sit amet consectetur. Purus cursu",
+      created_at: new Date("2024-04-19"),
+      user: {
+        username: "testuser",
+      },
+    },
+    {
+      _id: "22",
+      message: "Lorem ipsum dolor sit amet consectetur. Purus cursu",
+      created_at: new Date("2024-04-19"),
+      user: {
+        username: "testuser2",
+      },
+    },
+  ],
 };
 
 export default function PostDetail() {
@@ -53,6 +72,11 @@ export default function PostDetail() {
           </div>
           <div className="w-fit px-[20px] mt-[20px]">
             <Button label="Add Comments" outline />
+          </div>
+          <div className="px-[20px] mt-[30px]">
+            {post.comments?.map((comment) => (
+              <Comment key={comment._id} comment={comment} />
+            ))}
           </div>
         </div>
       </div>
