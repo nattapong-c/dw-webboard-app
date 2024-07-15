@@ -1,8 +1,40 @@
+"use client";
+
 import Button from "@/components/button/Button";
 import TextInput from "@/components/input/Text";
+import { Auth } from "@/services";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Login() {
+  const [token, setToken] = useState<string | any>(undefined);
+
+  const handleLogin = async (formData: FormData) => {
+    const username = formData.get("username") as string;
+    if (!username) {
+      // TODO handle validate
+      console.log("handle validate");
+    } else {
+      const result = await Auth.login(username);
+      setToken(result?.access_token);
+    }
+  };
+
+  useEffect(() => {
+    const existToken = localStorage.getItem("x-access");
+    if (existToken) {
+      redirect("/");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("x-access", token);
+      redirect("/");
+    }
+  }, [token]);
+
   return (
     <div className="flex max-md:flex-col h-screen max-md:w-screen bg-main-color ">
       <div className="bg-main-color max-md:order-last flex-auto">
@@ -11,10 +43,10 @@ export default function Login() {
             <h2 className="text-white font-inter text-28 font-semibold mb-[30px]">
               Sign in
             </h2>
-            <form>
-              <TextInput placeholder="username" />
+            <form action={handleLogin}>
+              <TextInput placeholder="username" name="username" />
               <div className="mt-[15px]">
-                <Button label="Sign in" confirm />
+                <Button label="Sign in" confirm submit />
               </div>
             </form>
             <a href="/">

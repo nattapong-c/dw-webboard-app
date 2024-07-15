@@ -18,7 +18,7 @@ interface HeaderProp {
 
 export default function Header(props: HeaderProp) {
   const [openMenu, setOpenMenu] = useState(false);
-
+  // TODO add logout
   return (
     <>
       <div className="bg-main-color py-[15px] px-[20px] flex justify-between fixed w-full z-50">
@@ -55,7 +55,7 @@ export default function Header(props: HeaderProp) {
             <button className="mb-[40px]" onClick={() => setOpenMenu(false)}>
               <ArrowRightIcon className="size-6 text-white" />
             </button>
-            <MainMenu menu={props.menu} />
+            <MainMenu menu={props.menu} user={props.user} />
           </div>
         </div>
       </div>

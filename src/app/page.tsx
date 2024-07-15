@@ -8,8 +8,10 @@ import Modal from "@/components/modal/Modal";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
+import { Auth } from "@/services";
 import { CommunityType } from "@/typing/post";
-import { useState } from "react";
+import { User } from "@/typing/user";
+import { useEffect, useState } from "react";
 // import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 const posts = [
@@ -22,7 +24,8 @@ const posts = [
     comment_count: 32,
     user: {
       username: "Wieee",
-      picture: "",
+      picture:
+        "https://scontent.fkdt3-1.fna.fbcdn.net/v/t39.30808-6/439895622_298237006662240_1963575465128457687_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF8hyEB2oU_QBcibnZMSY08wsJTGi0fVrjCwlMaLR9WuGe1HQ0-pj-8XvzMs_g7cGxWmOqpzZSqTYmexn05vC9K&_nc_ohc=cq_XMG_-LGkQ7kNvgEVycnA&_nc_ht=scontent.fkdt3-1.fna&oh=00_AYA0tvSunD8_T4kz0Yffmft2fLOJC_UAsPtwENdHek4XMw&oe=669B1FB7",
     },
     created_at: new Date("2024-03-09"),
   },
@@ -77,6 +80,7 @@ export default function Home() {
   // const [focusSearch, setFocusSearch] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [user, setUser] = useState<User | undefined>(undefined);
 
   const handleUpdatePost = () => {
     setOpenUpdate(true);
@@ -88,9 +92,42 @@ export default function Home() {
     setOpenDelete(true);
   };
 
+  const getMe = async () => {
+    const userId = localStorage.getItem("x-user-id");
+    if (userId) {
+      const username = localStorage.getItem("x-user-username") as string;
+      const picture = localStorage.getItem("x-user-picture") as string;
+      setUser({
+        _id: userId,
+        username,
+        picture,
+      });
+    } else {
+      const token = localStorage.getItem("x-access");
+      if (token) {
+        const user = await Auth.getMe(token);
+        if (user?._id) {
+          localStorage.setItem("x-user-id", user._id);
+        }
+        if (user?.username) {
+          localStorage.setItem("x-user-username", user?.username);
+        }
+        if (user?.picture) {
+          localStorage.setItem("x-user-picture", user.picture);
+        }
+
+        setUser(user);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getMe();
+  }, []);
+
   return (
     <main>
-      <Header menu="Home" />
+      <Header menu="Home" user={user} />
       <div className="p-[20px] pt-[98px] flex">
         <div className="max-md:hidden w-2/12">
           <MainMenu menu="Home" desktop />

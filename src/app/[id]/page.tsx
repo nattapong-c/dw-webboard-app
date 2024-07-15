@@ -8,8 +8,9 @@ import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
 import { CommunityType } from "@/typing/post";
+import { User } from "@/typing/user";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const post = {
   _id: "1",
@@ -46,10 +47,24 @@ const post = {
 export default function PostDetail() {
   const [openModal, setOpenModal] = useState(false);
   const [openTextArea, setOpenTextArea] = useState(false);
+  const [user, setUser] = useState<User | undefined>(undefined);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("x-user-id");
+    if (userId) {
+      const username = localStorage.getItem("x-user-username") as string;
+      const picture = localStorage.getItem("x-user-picture") as string;
+      setUser({
+        _id: userId,
+        username,
+        picture,
+      });
+    }
+  }, []);
 
   return (
     <main>
-      <Header menu="Home" />
+      <Header menu="Home" user={user} />
       <div className="pt-[74px] flex bg-white">
         <div className="p-[20px] max-md:hidden w-1/4 bg-main-gray">
           <MainMenu menu="Home" desktop />
