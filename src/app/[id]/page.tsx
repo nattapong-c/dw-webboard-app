@@ -9,6 +9,7 @@ import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
 import { CommunityType } from "@/typing/post";
 import { User } from "@/typing/user";
+import { Utils } from "@/utils";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 
@@ -50,15 +51,9 @@ export default function PostDetail() {
   const [user, setUser] = useState<User | undefined>(undefined);
 
   useEffect(() => {
-    const userId = localStorage.getItem("x-user-id");
-    if (userId) {
-      const username = localStorage.getItem("x-user-username") as string;
-      const picture = localStorage.getItem("x-user-picture") as string;
-      setUser({
-        _id: userId,
-        username,
-        picture,
-      });
+    const userLocal = Utils.getUserLocal();
+    if (userLocal._id) {
+      setUser(userLocal);
     }
   }, []);
 

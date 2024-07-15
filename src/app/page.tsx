@@ -11,6 +11,7 @@ import MainMenu from "@/layouts/menu/Menu";
 import { Auth } from "@/services";
 import { CommunityType } from "@/typing/post";
 import { User } from "@/typing/user";
+import { Utils } from "@/utils";
 import { useEffect, useState } from "react";
 // import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
@@ -78,30 +79,12 @@ export default function Home() {
     useState(undefined);
   const [openCreate, setOpenCreate] = useState(false);
   // const [focusSearch, setFocusSearch] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
 
-  const handleUpdatePost = () => {
-    setOpenUpdate(true);
-    // TODO fill form
-    // TODO reset form
-  };
-
-  const handleDeletePost = () => {
-    setOpenDelete(true);
-  };
-
   const getMe = async () => {
-    const userId = localStorage.getItem("x-user-id");
-    if (userId) {
-      const username = localStorage.getItem("x-user-username") as string;
-      const picture = localStorage.getItem("x-user-picture") as string;
-      setUser({
-        _id: userId,
-        username,
-        picture,
-      });
+    const userLocal = Utils.getUserLocal();
+    if (userLocal._id) {
+      setUser(userLocal);
     } else {
       const token = localStorage.getItem("x-access");
       if (token) {
@@ -183,9 +166,6 @@ export default function Home() {
                   user: post.user,
                   created_at: post.created_at,
                 }}
-                allowAction
-                onUpdate={() => handleUpdatePost()}
-                onDelete={() => handleDeletePost()}
               />
             ))}
           </div>
@@ -232,72 +212,6 @@ export default function Home() {
                   </div>
                 </div>
               </form>
-            </Modal>
-          )}
-          {openUpdate && (
-            <Modal title="Edit Post" onClose={() => setOpenUpdate(false)}>
-              <form>
-                <div className="mb-[10px] md:w-fit">
-                  <CommunityDropdown
-                    border
-                    title={selectedCommunityCreate ?? "Choose a community"}
-                    titleCenter
-                    createMode
-                    selected={selectedCommunityCreate}
-                    openOptions={openCommunityCreate}
-                    onToggle={() =>
-                      setOpenCommunityCreate(!openCommunityCreate)
-                    }
-                    onSelect={(e) => {
-                      if (
-                        e.target.innerHTML.includes(selectedCommunityCreate)
-                      ) {
-                        setSelectedCommunityCreate(undefined);
-                      } else {
-                        setSelectedCommunityCreate(e.target.innerHTML);
-                      }
-                    }}
-                  />
-                </div>
-                <TextInput placeholder="Title" />
-                <div className="mt-[10px]">
-                  <TextArea placeholder="What's on your mind..." />
-                </div>
-
-                <div className="mt-[20px] md:flex md:justify-end">
-                  <div className="max-md:mb-[15px] md:mr-[10px]">
-                    <Button
-                      label="Cancel"
-                      outline
-                      onClick={() => setOpenUpdate(false)}
-                    />
-                  </div>
-                  <div>
-                    <Button label="Confirm" confirm submit />
-                  </div>
-                </div>
-              </form>
-            </Modal>
-          )}
-          {openDelete && (
-            <Modal
-              title="Please comfirm if you wish to delete the post"
-              titleCenter
-              subtitle="Are you sure you want to delete the post? Once deleted, it cannot be recovered."
-              onClose={() => setOpenDelete(false)}
-            >
-              <div className="md:flex md:justify-end">
-                <div className="max-md:mb-[15px] md:order-last">
-                  <Button label="Delete" submit danger />
-                </div>
-                <div className="md:mr-[10px]">
-                  <Button
-                    label="Cancel"
-                    outline
-                    onClick={() => setOpenDelete(false)}
-                  />
-                </div>
-              </div>
             </Modal>
           )}
         </div>
