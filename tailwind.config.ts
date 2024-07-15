@@ -5,6 +5,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/layouts/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -16,7 +17,8 @@ const config: Config = {
       colors: {
         'main-color': '#243831',
         'secondary-color': '#2B5F44',
-        'confirm-color': '#49A569'
+        'confirm-color': '#49A569',
+        'main-gray': '#BBC2C0'
       },
       fontFamily: {
         'castoro': ['Castoro', 'sans-serif'],

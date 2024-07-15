@@ -2,12 +2,8 @@
 
 import Button from "@/components/button/Button";
 import { useState } from "react";
-import {
-  ArrowRightIcon,
-  Bars3Icon,
-  HomeIcon,
-  PencilSquareIcon,
-} from "@heroicons/react/24/solid";
+import { ArrowRightIcon, Bars3Icon } from "@heroicons/react/24/solid";
+import MainMenu from "../menu/Menu";
 
 enum Menu {
   "Home",
@@ -22,7 +18,7 @@ export default function Header(props: HeaderProp) {
 
   return (
     <>
-      <div className="bg-main-color py-[15px] px-[20px] flex justify-between">
+      <div className="bg-main-color py-[15px] px-[20px] flex justify-between fixed w-full">
         <div>
           <h1 className="text-white font-castoro italic text-24">a Board</h1>
         </div>
@@ -41,43 +37,14 @@ export default function Header(props: HeaderProp) {
           <div
             className={
               openMenu
-                ? "md:hidden absolute top-0 right-0 h-full w-5/6 bg-main-color p-[30px]"
+                ? "md:hidden fixed top-0 right-0 h-full w-5/6 bg-main-color p-[30px]"
                 : "hidden"
             }
           >
-            <ul>
-              <li className="mb-[40px]">
-                <button onClick={() => setOpenMenu(false)}>
-                  <ArrowRightIcon className="size-6 text-white" />
-                </button>
-              </li>
-              <li>
-                <a
-                  className={
-                    props.menu === "Home"
-                      ? "text-sm text-white font-bold hover:font-bold flex"
-                      : "text-sm text-white hover:font-bold flex"
-                  }
-                  href="#"
-                >
-                  <HomeIcon className="size-6 text-white mr-[15px]" />
-                  Home
-                </a>
-              </li>
-              <li className="pt-[10px]">
-                <a
-                  className={
-                    props.menu === "OurBlog"
-                      ? "text-sm text-white font-bold hover:font-bold flex"
-                      : "text-sm text-white hover:font-bold flex"
-                  }
-                  href="#"
-                >
-                  <PencilSquareIcon className="size-6 text-white mr-[15px]" />
-                  Our Blog
-                </a>
-              </li>
-            </ul>
+            <button className="mb-[40px]" onClick={() => setOpenMenu(false)}>
+              <ArrowRightIcon className="size-6 text-white" />
+            </button>
+            <MainMenu menu={props.menu} />
           </div>
         </div>
       </div>
