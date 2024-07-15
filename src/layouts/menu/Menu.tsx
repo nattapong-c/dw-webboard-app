@@ -50,7 +50,9 @@ export default function MainMenu(props: MenuProp) {
       </ul>
       {!props.desktop && (
         <div className="mt-[30px]">
-          <Button label="Sign in" confirm />
+          <a href="/login">
+            <Button label="Sign in" confirm />
+          </a>
         </div>
       )}
     </>

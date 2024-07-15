@@ -26,7 +26,9 @@ export default function Header(props: HeaderProp) {
         </div>
         <div>
           <div className="max-md:hidden">
-            <Button label="Sign in" confirm />
+            <a href="/login">
+              <Button label="Sign in" confirm />
+            </a>
           </div>
           <div className="md:hidden">
             <button
