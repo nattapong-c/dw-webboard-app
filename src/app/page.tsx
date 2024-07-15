@@ -19,6 +19,7 @@ const posts = [
       username: "Wieee",
       picture: "",
     },
+    created_at: new Date("2024-03-09"),
   },
   {
     _id: "2",
@@ -31,6 +32,7 @@ const posts = [
       username: "Wieee",
       picture: "",
     },
+    created_at: new Date("2024-03-09"),
   },
   {
     _id: "3",
@@ -43,6 +45,7 @@ const posts = [
       username: "Wieee",
       picture: "",
     },
+    created_at: new Date("2024-03-09"),
   },
   {
     _id: "4",
@@ -55,12 +58,13 @@ const posts = [
       username: "Wieee",
       picture: "",
     },
+    created_at: new Date("2024-03-09"),
   },
 ];
 
 export default function Home() {
   return (
-    <main className={`bg-main-gray ${posts.length > 0 ? "" : "h-screen"}`}>
+    <main>
       <Header menu="Home" />
       <div className="p-[20px] pt-[98px] flex">
         <div className="max-md:hidden w-1/4">
@@ -76,7 +80,7 @@ export default function Home() {
               </div>
             </form>
           </div>
-          <div className="mt-[15px] rounded-t-lg bg-white p-[2px]">
+          <div className="mt-[15px] rounded-lg bg-white p-[2px]">
             {posts.map((post) => (
               <Post
                 key={post._id}
@@ -87,6 +91,7 @@ export default function Home() {
                   community: post.community as CommunityType,
                   comment_count: post.comment_count,
                   user: post.user,
+                  created_at: post.created_at,
                 }}
               />
             ))}

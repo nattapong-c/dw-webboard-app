@@ -15,4 +15,5 @@ export interface Post {
     comment_count: number;
     user: User;
     comments?: Comment[];
+    created_at: Date;
 }

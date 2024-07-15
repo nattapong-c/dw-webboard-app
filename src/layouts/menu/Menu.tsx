@@ -21,7 +21,7 @@ export default function MainMenu(props: MenuProp) {
             className={`text-sm hover:font-bold flex ${
               props.desktop ? "text-black" : "text-white"
             } ${props.menu === "Home" ? "font-bold" : ""}`}
-            href="#"
+            href="/"
           >
             <HomeIcon
               className={`size-6 ${
