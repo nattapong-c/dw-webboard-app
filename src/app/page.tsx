@@ -3,6 +3,8 @@
 import Button from "@/components/button/Button";
 import CommunityDropdown from "@/components/dropdown/Community";
 import TextInput from "@/components/input/Text";
+import TextArea from "@/components/input/TextArea";
+import Modal from "@/components/modal/Modal";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
@@ -67,6 +69,10 @@ const posts = [
 export default function Home() {
   const [openCommunity, setOpenCommunity] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState(undefined);
+  const [openCommunityCreate, setOpenCommunityCreate] = useState(false);
+  const [selectedCommunityCreate, setSelectedCommunityCreate] =
+    useState(undefined);
+  const [openCreate, setOpenCreate] = useState(false);
 
   return (
     <main>
@@ -94,7 +100,7 @@ export default function Home() {
                 />
               </div>
               <div className="max-md:w-1/3 md:w-1/4">
-                <Button label="Create+" />
+                <Button label="Create+" onClick={() => setOpenCreate(true)} />
               </div>
             </form>
           </div>
@@ -114,6 +120,51 @@ export default function Home() {
               />
             ))}
           </div>
+          {openCreate && (
+            <Modal title="Create Post" onClose={() => setOpenCreate(false)}>
+              <form>
+                <div className="mb-[10px] md:w-fit">
+                  <CommunityDropdown
+                    border
+                    title="Choose a community"
+                    titleCenter
+                    createMode
+                    selected={selectedCommunityCreate}
+                    openOptions={openCommunityCreate}
+                    onToggle={() =>
+                      setOpenCommunityCreate(!openCommunityCreate)
+                    }
+                    onSelect={(e) => {
+                      if (
+                        e.target.innerHTML.includes(selectedCommunityCreate)
+                      ) {
+                        setSelectedCommunityCreate(undefined);
+                      } else {
+                        setSelectedCommunityCreate(e.target.innerHTML);
+                      }
+                    }}
+                  />
+                </div>
+                <TextInput placeholder="Title" />
+                <div className="mt-[10px]">
+                  <TextArea placeholder="What's on your mind..." />
+                </div>
+
+                <div className="mt-[20px] md:flex md:justify-end">
+                  <div className="max-md:mb-[15px] md:mr-[10px]">
+                    <Button
+                      label="Cancel"
+                      outline
+                      onClick={() => setOpenCreate(false)}
+                    />
+                  </div>
+                  <div>
+                    <Button label="Post" submit />
+                  </div>
+                </div>
+              </form>
+            </Modal>
+          )}
         </div>
       </div>
     </main>

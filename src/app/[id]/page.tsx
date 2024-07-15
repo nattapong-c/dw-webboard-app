@@ -117,17 +117,15 @@ export default function PostDetail() {
               <form>
                 <TextArea placeholder="What's on your mind..." />
                 <div className="mt-[20px] flex justify-end">
-                  <div className="flex justify-end">
-                    <div className="mr-[10px]">
-                      <Button
-                        label="Cancel"
-                        outline
-                        onClick={() => setOpenTextArea(false)}
-                      />
-                    </div>
-                    <div>
-                      <Button label="Post" submit />
-                    </div>
+                  <div className="mr-[10px]">
+                    <Button
+                      label="Cancel"
+                      outline
+                      onClick={() => setOpenTextArea(false)}
+                    />
+                  </div>
+                  <div>
+                    <Button label="Post" submit />
                   </div>
                 </div>
               </form>
