@@ -51,7 +51,7 @@ export default function MainMenu(props: MenuProp) {
             className={`text-sm hover:font-bold flex ${
               props.desktop ? "text-black" : "text-white"
             } ${props.menu === "OurBlog" ? "font-bold" : ""}`}
-            href="#"
+            href="/our-blog"
           >
             <PencilSquareIcon
               className={`size-6 ${
