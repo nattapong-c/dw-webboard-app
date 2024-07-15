@@ -1,11 +1,13 @@
 "use client";
 
 import Button from "@/components/button/Button";
+import CommunityDropdown from "@/components/dropdown/Community";
 import TextInput from "@/components/input/Text";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
 import { CommunityType } from "@/typing/post";
+import { useState } from "react";
 
 const posts = [
   {
@@ -63,18 +65,34 @@ const posts = [
 ];
 
 export default function Home() {
+  const [openCommunity, setOpenCommunity] = useState(false);
+  const [selectedCommunity, setSelectedCommunity] = useState(undefined);
+
   return (
     <main>
       <Header menu="Home" />
       <div className="p-[20px] pt-[98px] flex">
-        <div className="max-md:hidden w-1/4">
+        <div className="max-md:hidden w-2/12">
           <MainMenu menu="Home" desktop />
         </div>
-        <div className="md:w-2/4 max-md:w-full">
+        <div className="md:w-8/12 max-md:w-full">
           <div>
             <form className="flex">
               <TextInput placeholder="search" transparentBackground />
-              <div>dropdown</div>
+              <div>
+                <CommunityDropdown
+                  selected={selectedCommunity}
+                  openOptions={openCommunity}
+                  onToggle={() => setOpenCommunity(!openCommunity)}
+                  onSelect={(e) => {
+                    if (e.target.innerHTML.includes(selectedCommunity)) {
+                      setSelectedCommunity(undefined);
+                    } else {
+                      setSelectedCommunity(e.target.innerHTML);
+                    }
+                  }}
+                />
+              </div>
               <div className="max-md:w-1/3 md:w-1/4">
                 <Button label="Create+" />
               </div>
