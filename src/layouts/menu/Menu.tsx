@@ -1,6 +1,8 @@
 "use client";
 
 import Button from "@/components/button/Button";
+import UserLogin from "@/components/user/UserLogin";
+import { User } from "@/typing/user";
 import { HomeIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 
 enum MenuEnum {
@@ -11,11 +13,23 @@ enum MenuEnum {
 interface MenuProp {
   menu: keyof typeof MenuEnum;
   desktop?: boolean;
+  user?: User;
 }
 
 export default function MainMenu(props: MenuProp) {
   return (
     <>
+      {!props.desktop && (
+        <div className="mb-[30px] flex justify-end">
+          {props.user ? (
+            <UserLogin user={props.user} />
+          ) : (
+            <a href="/login">
+              <Button label="Sign in" confirm />
+            </a>
+          )}
+        </div>
+      )}
       <ul>
         <li>
           <a
@@ -48,13 +62,6 @@ export default function MainMenu(props: MenuProp) {
           </a>
         </li>
       </ul>
-      {!props.desktop && (
-        <div className="mt-[30px]">
-          <a href="/login">
-            <Button label="Sign in" confirm />
-          </a>
-        </div>
-      )}
     </>
   );
 }

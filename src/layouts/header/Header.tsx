@@ -4,6 +4,8 @@ import Button from "@/components/button/Button";
 import { useState } from "react";
 import { ArrowRightIcon, Bars3Icon } from "@heroicons/react/24/solid";
 import MainMenu from "../menu/Menu";
+import { User } from "@/typing/user";
+import UserLogin from "@/components/user/UserLogin";
 
 enum Menu {
   "Home",
@@ -11,6 +13,7 @@ enum Menu {
 }
 interface HeaderProp {
   menu: keyof typeof Menu;
+  user?: User;
 }
 
 export default function Header(props: HeaderProp) {
@@ -26,9 +29,13 @@ export default function Header(props: HeaderProp) {
         </div>
         <div>
           <div className="max-md:hidden">
-            <a href="/login">
-              <Button label="Sign in" confirm />
-            </a>
+            {props.user ? (
+              <UserLogin user={props.user} />
+            ) : (
+              <a href="/login">
+                <Button label="Sign in" confirm />
+              </a>
+            )}
           </div>
           <div className="md:hidden">
             <button
