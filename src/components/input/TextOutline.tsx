@@ -7,7 +7,7 @@ export default function TextOutlineInput(props: TextInputProp) {
     <>
       <input
         type="text"
-        className="appearance-none border rounded w-full py-2 px-3 bg-transparent"
+        className="appearance-none border rounded-lg w-full py-2 px-3 bg-transparent"
         placeholder={props.placeholder}
       />
     </>

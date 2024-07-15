@@ -18,7 +18,12 @@ const config: Config = {
         'main-color': '#243831',
         'secondary-color': '#2B5F44',
         'confirm-color': '#49A569',
-        'main-gray': '#BBC2C0'
+        'danger-color': '#F23536',
+        'main-gray': '#BBC2C0',
+        'gray-f3': '#F3F3F3',
+        'gray-4a': '#4A4A4A',
+        'gray-300': '#939494',
+        'main-black': '#101828'
       },
       fontFamily: {
         'castoro': ['Castoro', 'sans-serif'],
@@ -30,6 +35,8 @@ const config: Config = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+  ],
 };
 export default config;
