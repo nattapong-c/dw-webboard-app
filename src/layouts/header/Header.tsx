@@ -20,7 +20,9 @@ export default function Header(props: HeaderProp) {
     <>
       <div className="bg-main-color py-[15px] px-[20px] flex justify-between fixed w-full z-50">
         <div>
-          <h1 className="text-white font-castoro italic text-24">a Board</h1>
+          <a href="/">
+            <h1 className="text-white font-castoro italic text-24">a Board</h1>
+          </a>
         </div>
         <div>
           <div className="max-md:hidden">
