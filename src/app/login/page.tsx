@@ -17,6 +17,11 @@ export default function Login() {
                 <Button label="Sign in" confirm />
               </div>
             </form>
+            <a href="/">
+              <p className="text-gray-300 text-[12px] mt-[30px]">
+                skip sign in
+              </p>
+            </a>
           </div>
         </div>
       </div>
