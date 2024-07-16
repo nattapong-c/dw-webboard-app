@@ -38,6 +38,7 @@ export default function OurBlog() {
     topic: "",
     content: "",
   });
+  const [postDelete, setPostDelete] = useState<PostType | undefined>(undefined);
 
   const debouncedSearch = useDebounce(search, 1500);
 
@@ -94,8 +95,22 @@ export default function OurBlog() {
     await listPost(selectedCommunity, search);
   };
 
-  const handleDeletePost = () => {
+  const openDeletePost = (post: PostType) => {
     setOpenDelete(true);
+    setPostDelete(post);
+  };
+
+  const handleDeletePost = async () => {
+    if (postDelete) {
+      setLoadingPost(true);
+      await PostService.deletePost(
+        postDelete._id,
+        localStorage.getItem("x-access") || ""
+      );
+      setLoadingPost(false);
+      await listPost(selectedCommunity, search);
+      setOpenDelete(false);
+    }
   };
 
   const listPost = async (community?: string, topic?: string) => {
@@ -207,7 +222,7 @@ export default function OurBlog() {
                 }}
                 allowAction={user !== undefined}
                 onUpdate={() => openUpdatePost(post)}
-                onDelete={() => handleDeletePost()}
+                onDelete={() => openDeletePost(post)}
               />
             ))}
           </div>
@@ -316,7 +331,12 @@ export default function OurBlog() {
             >
               <div className="md:flex md:justify-end">
                 <div className="max-md:mb-[15px] md:order-last">
-                  <Button label="Delete" submit danger />
+                  <Button
+                    label="Delete"
+                    submit
+                    danger
+                    onClick={() => handleDeletePost()}
+                  />
                 </div>
                 <div className="md:mr-[10px]">
                   <Button

@@ -57,3 +57,16 @@ export const update = async (id: string, payload: PostDto, token: string) => {
         // TODO handle error
     }
 }
+
+export const deletePost = async (id: string, token: string) => {
+    try {
+        await axios.delete(`${process.env.NEXT_PUBLIC_SERVICE_URL}/post/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    } catch (error) {
+        console.log((error as AxiosError).response?.data)
+        // TODO handle error
+    }
+}
