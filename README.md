@@ -10,7 +10,7 @@ Install package service
 
 ## Environment Variables
 
-To run this project, you will need to add the following environment variables to your `.env.local` (for development) file or `.env.production` (for build version)
+To run this project, you will need to add the following environment variables to your `.env` file
 
 see example in .env.example file
 
