@@ -16,8 +16,11 @@ import { useEffect, useState } from "react";
 import { Post as PostService } from "@/services";
 import { useDebounce } from "@/utils/debounce";
 import { redirect } from "next/navigation";
+// @ts-ignore
+import { useToast } from "tw-noti";
 
 export default function OurBlog() {
+  const { enqueueToast } = useToast();
   const [openCommunity, setOpenCommunity] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState(undefined);
   const [openCommunityCreate, setOpenCommunityCreate] = useState(false);
@@ -77,24 +80,36 @@ export default function OurBlog() {
     setOpenCommunityUpdate(false);
   };
 
+  const onCloseCreate = () => {
+    setLoadingPost(false);
+    setOpenCreate(false);
+  };
+
+  const onCloseUpdate = () => {
+    setLoadingPost(false);
+    setOpenUpdate(false);
+  };
+
   const handleUpdatePost = async (formData: FormData) => {
-    setLoadingPost(true);
     const topic = formData.get("topic") as string;
     const content = formData.get("content") as string;
 
-    await PostService.update(
-      formDataUpdate.id,
-      {
-        topic,
-        content,
-        community: selectedCommunityUpdate as CommunityType,
-      },
-      token
-    );
-
-    setLoadingPost(false);
-    setOpenUpdate(false);
-    await listPost(selectedCommunity, search);
+    try {
+      setLoadingPost(true);
+      await PostService.update(
+        formDataUpdate.id,
+        {
+          topic,
+          content,
+          community: selectedCommunityUpdate,
+        },
+        token
+      );
+      onCloseUpdate();
+      await listPost(selectedCommunity, search);
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
+    }
   };
 
   const openDeletePost = (post: PostType) => {
@@ -105,45 +120,51 @@ export default function OurBlog() {
   const handleDeletePost = async () => {
     if (postDelete) {
       setLoadingPost(true);
-      await PostService.deletePost(postDelete._id, token);
+      try {
+        await PostService.deletePost(postDelete._id, token);
+      } catch (error: any) {
+        enqueueToast({ content: error.message, type: "error" });
+      }
       setLoadingPost(false);
-      await listPost(selectedCommunity, search);
       setOpenDelete(false);
+      await listPost(selectedCommunity, search);
     }
   };
 
   const listPost = async (community?: string, topic?: string) => {
     setLoadingPost(true);
     if (token) {
-      const results = await PostService.list(community, topic, token, true);
-      setPost(results || []);
+      try {
+        const results = await PostService.list(community, topic, token, true);
+        setPost(results || []);
+      } catch (error: any) {
+        enqueueToast({ content: error.message, type: "error" });
+      }
     }
     setLoadingPost(false);
   };
 
   const createPost = async (formData: FormData) => {
-    setLoadingPost(true);
     const topic = formData.get("topic") as string;
     const content = formData.get("content") as string;
 
-    if (!selectedCommunityCreate) {
-      // TODO handle validate
-      return "";
+    try {
+      setLoadingPost(true);
+      await PostService.create(
+        {
+          topic,
+          content,
+          community: selectedCommunityCreate,
+        },
+        localStorage.getItem("x-access") || ""
+      );
+      onCloseCreate();
+      setOpenCommunityCreate(false);
+      setSelectedCommunityCreate(undefined);
+      await listPost(selectedCommunity, search);
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
     }
-    await PostService.create(
-      {
-        topic,
-        content,
-        community: selectedCommunityCreate,
-      },
-      token
-    );
-
-    setLoadingPost(false);
-    setOpenCreate(false);
-    setOpenCommunityCreate(false);
-    setSelectedCommunityCreate(undefined);
-    await listPost(selectedCommunity, search);
   };
 
   useEffect(() => {
@@ -240,7 +261,7 @@ export default function OurBlog() {
             ))}
           </div>
           {openCreate && (
-            <Modal title="Create Post" onClose={() => setOpenCreate(false)}>
+            <Modal title="Create Post" onClose={() => onCloseCreate()}>
               <form action={createPost}>
                 <div className="mb-[10px] md:w-fit">
                   <CommunityDropdown
@@ -278,7 +299,7 @@ export default function OurBlog() {
                     <Button
                       label="Cancel"
                       outline
-                      onClick={() => setOpenCreate(false)}
+                      onClick={() => onCloseCreate()}
                     />
                   </div>
                   <div>
@@ -289,7 +310,7 @@ export default function OurBlog() {
             </Modal>
           )}
           {openUpdate && (
-            <Modal title="Edit Post" onClose={() => setOpenUpdate(false)}>
+            <Modal title="Edit Post" onClose={() => onCloseUpdate()}>
               <form action={handleUpdatePost}>
                 <div className="mb-[10px] md:w-fit">
                   <CommunityDropdown
@@ -325,7 +346,7 @@ export default function OurBlog() {
                     <Button
                       label="Cancel"
                       outline
-                      onClick={() => setOpenUpdate(false)}
+                      onClick={() => onCloseUpdate()}
                     />
                   </div>
                   <div>

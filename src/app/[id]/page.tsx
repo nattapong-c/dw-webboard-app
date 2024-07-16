@@ -15,27 +15,39 @@ import { Utils } from "@/utils";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+// @ts-ignore
+import { useToast } from "tw-noti";
 
 export default function PostDetail() {
+  const { enqueueToast } = useToast();
   const [openModal, setOpenModal] = useState(false);
   const [openTextArea, setOpenTextArea] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [loadingPost, setLoadingPost] = useState(true);
   const [post, setPost] = useState<PostType | undefined>(undefined);
   const [token, setToken] = useState("");
+  const [message, setMessage] = useState("");
 
   const params = useParams<{ id: string }>();
 
   const getPost = async () => {
     setLoadingPost(true);
-    const post = await PostService.get(params.id);
-    setPost(post);
+    try {
+      const post = await PostService.get(params.id);
+      setPost(post);
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
+    }
     setLoadingPost(false);
   };
 
   const deleteComment = async (commentId: string) => {
     setLoadingPost(true);
-    await CommentService.deleteComment(commentId, token);
+    try {
+      await CommentService.deleteComment(commentId, token);
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
+    }
     setLoadingPost(false);
     await getPost();
   };
@@ -51,34 +63,42 @@ export default function PostDetail() {
     getPost();
   }, []);
 
+  const onCloseCreateMobile = () => {
+    setLoadingPost(false);
+    setOpenModal(false);
+  };
+
+  const onCloseCreateDesktop = () => {
+    setLoadingPost(false);
+    setOpenModal(false);
+  };
+
   const handleCreateComment = async (formData: FormData) => {
     setLoadingPost(true);
     const message = formData.get("message") as string;
-    await CommentService.create(
-      {
-        message,
-        post_id: params.id,
-      },
-      token
-    );
-
-    setLoadingPost(false);
+    try {
+      await CommentService.create(
+        {
+          message,
+          post_id: params.id,
+        },
+        token
+      );
+      await getPost();
+      onCloseCreateMobile();
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
+    }
   };
 
   const createOnMobile = async (formData: FormData) => {
     await handleCreateComment(formData);
-    setOpenModal(false);
-    setLoadingPost(true);
-    await getPost();
-    setLoadingPost(false);
   };
 
   const createOnDesktop = async (formData: FormData) => {
     await handleCreateComment(formData);
-    setOpenTextArea(false);
-    setLoadingPost(true);
-    await getPost();
     setLoadingPost(false);
+    setMessage("");
   };
 
   return (
@@ -142,7 +162,7 @@ export default function PostDetail() {
 
           {openModal && (
             <div className="md:hidden">
-              <Modal title="Add Comments" onClose={() => setOpenModal(false)}>
+              <Modal title="Add Comments" onClose={() => onCloseCreateMobile()}>
                 <form action={createOnMobile}>
                   <TextArea
                     placeholder="What's on your mind..."
@@ -152,7 +172,7 @@ export default function PostDetail() {
                     <Button
                       label="Cancel"
                       outline
-                      onClick={() => setOpenModal(false)}
+                      onClick={() => onCloseCreateMobile()}
                     />
                   </div>
                   <div>
@@ -165,13 +185,18 @@ export default function PostDetail() {
           {openTextArea && (
             <div className="max-md:hidden px-[20px]">
               <form action={createOnDesktop}>
-                <TextArea placeholder="What's on your mind..." name="message" />
+                <TextArea
+                  placeholder="What's on your mind..."
+                  name="message"
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                />
                 <div className="mt-[20px] flex justify-end">
                   <div className="mr-[10px]">
                     <Button
                       label="Cancel"
                       outline
-                      onClick={() => setOpenTextArea(false)}
+                      onClick={() => onCloseCreateDesktop()}
                     />
                   </div>
                   <div>

@@ -27,5 +27,5 @@ export interface PostPagination {
 export interface PostDto {
     topic: string,
     content: string,
-    community: CommunityType,
+    community?: CommunityType,
 }

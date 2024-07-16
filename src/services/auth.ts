@@ -1,19 +1,19 @@
 "use server"
-import axios, { AxiosError, AxiosResponse } from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import { TokenResponse } from "@/typing/auth";
 import { User } from "@/typing/user";
+import { responseError } from "@/utils/error";
 
-export const login = async (username: string): Promise<TokenResponse | undefined> => {
+export const login = async (username: string): Promise<TokenResponse> => {
     try {
         const result = await axios.post<AxiosResponse<TokenResponse>>(`${process.env.NEXT_PUBLIC_SERVICE_URL}/auth/login`, {
             username
         });
 
         return result.data.data;
-    } catch (error) {
-        console.log((error as AxiosError).response?.data)
-        // TODO handle error
+    } catch (error: any) {
+        throw new Error(responseError(error));
     }
 }
 
@@ -27,7 +27,6 @@ export const getMe = async (token: string): Promise<User | undefined> => {
 
         return result.data.data;
     } catch (error) {
-        console.log((error as AxiosError).response?.data)
-        // TODO handle error
+        throw new Error(responseError(error));
     }
 }

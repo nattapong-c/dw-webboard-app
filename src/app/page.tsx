@@ -15,8 +15,11 @@ import { User } from "@/typing/user";
 import { Utils } from "@/utils";
 import { useDebounce } from "@/utils/debounce";
 import { useEffect, useState } from "react";
+// @ts-ignore
+import { useToast } from "tw-noti";
 
 export default function Home() {
+  const { enqueueToast } = useToast();
   const [openCommunity, setOpenCommunity] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState(undefined);
   const [openCommunityCreate, setOpenCommunityCreate] = useState(false);
@@ -27,6 +30,8 @@ export default function Home() {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [posts, setPost] = useState<PostType[]>([]);
   const [loadingPost, setLoadingPost] = useState(true);
+  const [validate, setValidate] = useState<any>({});
+
   const debouncedSearch = useDebounce(search, 1500);
 
   const getMe = async () => {
@@ -36,15 +41,19 @@ export default function Home() {
     } else {
       const token = localStorage.getItem("x-access");
       if (token) {
-        const user = await Auth.getMe(token);
-        if (user?._id) {
-          localStorage.setItem("x-user-id", user._id);
-        }
-        if (user?.username) {
-          localStorage.setItem("x-user-username", user?.username);
-        }
-        if (user?.picture) {
-          localStorage.setItem("x-user-picture", user.picture);
+        try {
+          const user = await Auth.getMe(token);
+          if (user?._id) {
+            localStorage.setItem("x-user-id", user._id);
+          }
+          if (user?.username) {
+            localStorage.setItem("x-user-username", user?.username);
+          }
+          if (user?.picture) {
+            localStorage.setItem("x-user-picture", user.picture);
+          }
+        } catch (error: any) {
+          enqueueToast({ content: error.message, type: "error" });
         }
 
         setUser(user);
@@ -54,34 +63,41 @@ export default function Home() {
 
   const listPost = async (community?: string, topic?: string) => {
     setLoadingPost(true);
-    const results = await PostService.list(community, topic);
-    setPost(results || []);
+    try {
+      const results = await PostService.list(community, topic);
+      setPost(results || []);
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
+    }
     setLoadingPost(false);
   };
 
+  const onCloseCreate = () => {
+    setLoadingPost(false);
+    setOpenCreate(false);
+  };
+
   const createPost = async (formData: FormData) => {
-    setLoadingPost(true);
     const topic = formData.get("topic") as string;
     const content = formData.get("content") as string;
 
-    if (!selectedCommunityCreate) {
-      // TODO handle validate
-      return "";
+    try {
+      setLoadingPost(true);
+      await PostService.create(
+        {
+          topic,
+          content,
+          community: selectedCommunityCreate,
+        },
+        localStorage.getItem("x-access") || ""
+      );
+      onCloseCreate();
+      setOpenCommunityCreate(false);
+      setSelectedCommunityCreate(undefined);
+      await listPost(selectedCommunity, search);
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
     }
-    await PostService.create(
-      {
-        topic,
-        content,
-        community: selectedCommunityCreate,
-      },
-      localStorage.getItem("x-access") || ""
-    );
-
-    setLoadingPost(false);
-    setOpenCreate(false);
-    setOpenCommunityCreate(false);
-    setSelectedCommunityCreate(undefined);
-    await listPost(selectedCommunity, search);
   };
 
   useEffect(() => {
@@ -165,7 +181,7 @@ export default function Home() {
             ))}
           </div>
           {openCreate && (
-            <Modal title="Create Post" onClose={() => setOpenCreate(false)}>
+            <Modal title="Create Post" onClose={() => onCloseCreate()}>
               <form action={createPost}>
                 <div className="mb-[10px] md:w-fit">
                   <CommunityDropdown
@@ -189,13 +205,28 @@ export default function Home() {
                       setOpenCommunityCreate(false);
                     }}
                   />
+                  {validate?.community && (
+                    <p className="text-danger-color text-[12px]">
+                      {validate.community}
+                    </p>
+                  )}
                 </div>
                 <TextInput placeholder="Title" name="topic" />
+                {validate?.topic && (
+                  <p className="text-danger-color text-[12px]">
+                    {validate.topic}
+                  </p>
+                )}
                 <div className="mt-[10px]">
                   <TextArea
                     placeholder="What's on your mind..."
                     name="content"
                   />
+                  {validate?.content && (
+                    <p className="text-danger-color text-[12px]">
+                      {validate.content}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-[20px] md:flex md:justify-end">
@@ -203,7 +234,7 @@ export default function Home() {
                     <Button
                       label="Cancel"
                       outline
-                      onClick={() => setOpenCreate(false)}
+                      onClick={() => onCloseCreate()}
                     />
                   </div>
                   <div>
