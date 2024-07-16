@@ -144,6 +144,11 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-[15px] rounded-lg bg-white p-[2px]">
+            {!posts.length && (
+              <div className="py-[10px]">
+                <p className="text-center">No posts to display.</p>
+              </div>
+            )}
             {posts?.map((post) => (
               <Post
                 key={post._id}

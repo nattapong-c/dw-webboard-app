@@ -2,7 +2,7 @@
 import { Post, PostDto, PostPagination } from "@/typing/post";
 import axios, { AxiosError, AxiosResponse } from "axios"
 
-export const list = async (community?: string, topic?: string, token?: string): Promise<Post[] | undefined> => {
+export const list = async (community?: string, topic?: string, token?: string, isPrivate?: boolean): Promise<Post[] | undefined> => {
     try {
         const params: any = {
             page: 1,
@@ -13,6 +13,9 @@ export const list = async (community?: string, topic?: string, token?: string): 
         }
         if (topic) {
             params['topic'] = topic;
+        }
+        if (isPrivate) {
+            params['private'] = isPrivate
         }
 
         const headers: any = {};

@@ -15,6 +15,7 @@ import { Utils } from "@/utils";
 import { useEffect, useState } from "react";
 import { Post as PostService } from "@/services";
 import { useDebounce } from "@/utils/debounce";
+import { redirect } from "next/navigation";
 
 export default function OurBlog() {
   const [openCommunity, setOpenCommunity] = useState(false);
@@ -38,6 +39,7 @@ export default function OurBlog() {
     topic: "",
     content: "",
   });
+  const [token, setToken] = useState("");
   const [postDelete, setPostDelete] = useState<PostType | undefined>(undefined);
 
   const debouncedSearch = useDebounce(search, 1500);
@@ -87,7 +89,7 @@ export default function OurBlog() {
         content,
         community: selectedCommunityUpdate as CommunityType,
       },
-      localStorage.getItem("x-access") || ""
+      token
     );
 
     setLoadingPost(false);
@@ -103,10 +105,7 @@ export default function OurBlog() {
   const handleDeletePost = async () => {
     if (postDelete) {
       setLoadingPost(true);
-      await PostService.deletePost(
-        postDelete._id,
-        localStorage.getItem("x-access") || ""
-      );
+      await PostService.deletePost(postDelete._id, token);
       setLoadingPost(false);
       await listPost(selectedCommunity, search);
       setOpenDelete(false);
@@ -115,8 +114,10 @@ export default function OurBlog() {
 
   const listPost = async (community?: string, topic?: string) => {
     setLoadingPost(true);
-    const results = await PostService.list(community, topic);
-    setPost(results || []);
+    if (token) {
+      const results = await PostService.list(community, topic, token, true);
+      setPost(results || []);
+    }
     setLoadingPost(false);
   };
 
@@ -135,7 +136,7 @@ export default function OurBlog() {
         content,
         community: selectedCommunityCreate,
       },
-      localStorage.getItem("x-access") || ""
+      token
     );
 
     setLoadingPost(false);
@@ -150,9 +151,16 @@ export default function OurBlog() {
     const userLocal = Utils.getUserLocal();
     if (userLocal._id) {
       setUser(userLocal);
+      setToken(localStorage.getItem("x-access") || "");
+    } else {
+      redirect("/login");
     }
     setLoadingPost(false);
   }, []);
+
+  useEffect(() => {
+    listPost(selectedCommunity, search);
+  }, [token]);
 
   useEffect(() => {
     listPost(selectedCommunity, search);
@@ -208,6 +216,11 @@ export default function OurBlog() {
             </div>
           </div>
           <div className="mt-[15px] rounded-lg bg-white p-[2px]">
+            {!posts.length && (
+              <div className="py-[10px]">
+                <p className="text-center">No posts to display.</p>
+              </div>
+            )}
             {posts?.map((post) => (
               <Post
                 key={post._id}
