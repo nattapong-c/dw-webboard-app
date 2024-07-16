@@ -73,3 +73,13 @@ export const deletePost = async (id: string, token: string) => {
         // TODO handle error
     }
 }
+
+export const get = async (id: string): Promise<Post | undefined> => {
+    try {
+        const result = await axios.get<AxiosResponse<Post>>(`${process.env.NEXT_PUBLIC_SERVICE_URL}/post/${id}`)
+        return result.data.data;
+    } catch (error) {
+        console.log((error as AxiosError).response?.data)
+        // TODO handle error
+    }
+}
