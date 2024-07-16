@@ -70,7 +70,7 @@ export default function PostDetail() {
 
   const onCloseCreateDesktop = () => {
     setLoadingPost(false);
-    setOpenModal(false);
+    setOpenTextArea(false);
   };
 
   const handleCreateComment = async (formData: FormData) => {
