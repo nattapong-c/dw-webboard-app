@@ -26,7 +26,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [user, setUser] = useState<User | undefined>(undefined);
   const [posts, setPost] = useState<PostType[]>([]);
-  const [loadingPost, setLoadingPost] = useState(false);
+  const [loadingPost, setLoadingPost] = useState(true);
   const debouncedSearch = useDebounce(search, 1500);
 
   const getMe = async () => {

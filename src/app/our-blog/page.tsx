@@ -32,7 +32,7 @@ export default function OurBlog() {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
-  const [loadingPost, setLoadingPost] = useState(false);
+  const [loadingPost, setLoadingPost] = useState(true);
   const [posts, setPost] = useState<PostType[]>([]);
   const [formDataUpdate, setFormDataUpdate] = useState({
     id: "",

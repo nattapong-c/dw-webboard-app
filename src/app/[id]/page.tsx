@@ -20,15 +20,24 @@ export default function PostDetail() {
   const [openModal, setOpenModal] = useState(false);
   const [openTextArea, setOpenTextArea] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
-  const [loadingPost, setLoadingPost] = useState(false);
+  const [loadingPost, setLoadingPost] = useState(true);
   const [post, setPost] = useState<PostType | undefined>(undefined);
   const [token, setToken] = useState("");
 
   const params = useParams<{ id: string }>();
 
   const getPost = async () => {
+    setLoadingPost(true);
     const post = await PostService.get(params.id);
     setPost(post);
+    setLoadingPost(false);
+  };
+
+  const deleteComment = async (commentId: string) => {
+    setLoadingPost(true);
+    await CommentService.deleteComment(commentId, token);
+    setLoadingPost(false);
+    await getPost();
   };
 
   useEffect(() => {
@@ -38,8 +47,8 @@ export default function PostDetail() {
       setUser(userLocal);
       setToken(localStorage.getItem("x-access") || "");
     }
-    getPost();
     setLoadingPost(false);
+    getPost();
   }, []);
 
   const handleCreateComment = async (formData: FormData) => {
@@ -59,13 +68,17 @@ export default function PostDetail() {
   const createOnMobile = async (formData: FormData) => {
     await handleCreateComment(formData);
     setOpenModal(false);
+    setLoadingPost(true);
     await getPost();
+    setLoadingPost(false);
   };
 
   const createOnDesktop = async (formData: FormData) => {
     await handleCreateComment(formData);
     setOpenTextArea(false);
+    setLoadingPost(true);
     await getPost();
+    setLoadingPost(false);
   };
 
   return (
@@ -101,23 +114,27 @@ export default function PostDetail() {
                     created_at: post.created_at,
                   }}
                 />
-                <div className="w-fit px-[20px] mt-[20px] md:hidden">
-                  <Button
-                    label="Add Comments"
-                    outline
-                    confirm
-                    onClick={() => setOpenModal(true)}
-                  />
-                </div>
-                {!openTextArea && (
-                  <div className="w-fit px-[20px] mt-[20px] max-md:hidden">
-                    <Button
-                      label="Add Comments"
-                      outline
-                      confirm
-                      onClick={() => setOpenTextArea(true)}
-                    />
-                  </div>
+                {user && (
+                  <>
+                    <div className="w-fit px-[20px] mt-[20px] md:hidden">
+                      <Button
+                        label="Add Comments"
+                        outline
+                        confirm
+                        onClick={() => setOpenModal(true)}
+                      />
+                    </div>
+                    {!openTextArea && (
+                      <div className="w-fit px-[20px] mt-[20px] max-md:hidden">
+                        <Button
+                          label="Add Comments"
+                          outline
+                          confirm
+                          onClick={() => setOpenTextArea(true)}
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -167,7 +184,12 @@ export default function PostDetail() {
           {post !== undefined && (
             <div className="px-[20px] mt-[30px]">
               {post.comments?.map((comment) => (
-                <Comment key={comment._id} comment={comment} />
+                <Comment
+                  key={comment._id}
+                  comment={comment}
+                  onDelete={() => deleteComment(comment._id)}
+                  allowAction={user?._id === comment.user._id}
+                />
               ))}
             </div>
           )}
