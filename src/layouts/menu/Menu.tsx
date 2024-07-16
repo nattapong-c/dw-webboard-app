@@ -32,7 +32,7 @@ export default function MainMenu(props: MenuProp) {
           )}
         </div>
       )}
-      <ul>
+      <ul className={props.desktop ? "fixed top-[100px]" : ""}>
         <li>
           <a
             className={`text-sm hover:font-bold flex ${
