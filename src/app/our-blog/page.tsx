@@ -16,62 +16,6 @@ import { useEffect, useState } from "react";
 import { Post as PostService } from "@/services";
 import { useDebounce } from "@/utils/debounce";
 
-const posts = [
-  {
-    _id: "1",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "History",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture:
-        "https://scontent.fkdt3-1.fna.fbcdn.net/v/t39.30808-6/439895622_298237006662240_1963575465128457687_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF8hyEB2oU_QBcibnZMSY08wsJTGi0fVrjCwlMaLR9WuGe1HQ0-pj-8XvzMs_g7cGxWmOqpzZSqTYmexn05vC9K&_nc_ohc=cq_XMG_-LGkQ7kNvgEVycnA&_nc_ht=scontent.fkdt3-1.fna&oh=00_AYA0tvSunD8_T4kz0Yffmft2fLOJC_UAsPtwENdHek4XMw&oe=669B1FB7",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-  {
-    _id: "2",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "History",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture: "",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-  {
-    _id: "3",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "History",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture: "",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-  {
-    _id: "4",
-    topic: "The Big Short War",
-    content:
-      "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-    community: "Exercise",
-    comment_count: 32,
-    user: {
-      username: "Wieee",
-      picture: "",
-    },
-    created_at: new Date("2024-03-09"),
-  },
-];
-
 export default function OurBlog() {
   const [openCommunity, setOpenCommunity] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState(undefined);
