@@ -4,14 +4,17 @@ import Button from "@/components/button/Button";
 import CommunityDropdown from "@/components/dropdown/Community";
 import TextInput from "@/components/input/Text";
 import TextArea from "@/components/input/TextArea";
+import Loader from "@/components/loader/Loader";
 import Modal from "@/components/modal/Modal";
 import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
-import { CommunityType } from "@/typing/post";
+import { CommunityType, Post as PostType } from "@/typing/post";
 import { User } from "@/typing/user";
 import { Utils } from "@/utils";
 import { useEffect, useState } from "react";
+import { Post as PostService } from "@/services";
+import { useDebounce } from "@/utils/debounce";
 
 const posts = [
   {
@@ -76,10 +79,13 @@ export default function OurBlog() {
   const [selectedCommunityCreate, setSelectedCommunityCreate] =
     useState(undefined);
   const [openCreate, setOpenCreate] = useState(false);
-  // const [focusSearch, setFocusSearch] = useState(false);
+  const [search, setSearch] = useState("");
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [loadingPost, setLoadingPost] = useState(false);
+  const [posts, setPost] = useState<PostType[]>([]);
+  const debouncedSearch = useDebounce(search, 1500);
 
   const handleUpdatePost = () => {
     setOpenUpdate(true);
@@ -98,30 +104,67 @@ export default function OurBlog() {
     }
   }, []);
 
+  const listPost = async (community?: string, topic?: string) => {
+    setLoadingPost(true);
+    const results = await PostService.list(community, topic);
+    setPost(results || []);
+    setLoadingPost(false);
+  };
+
+  const createPost = async (formData: FormData) => {
+    setLoadingPost(true);
+    const topic = formData.get("topic") as string;
+    const content = formData.get("content") as string;
+
+    if (!selectedCommunityCreate) {
+      return "";
+    }
+    await PostService.create(
+      {
+        topic,
+        content,
+        community: selectedCommunityCreate,
+        user_id: user?._id || "",
+      },
+      localStorage.getItem("x-access") || ""
+    );
+
+    setLoadingPost(false);
+    setOpenCreate(false);
+    setOpenCommunityCreate(false);
+    setSelectedCommunityCreate(undefined);
+    await listPost(selectedCommunity, search);
+  };
+
+  useEffect(() => {
+    listPost(selectedCommunity, search);
+  }, [selectedCommunity]);
+
+  useEffect(() => {
+    if (debouncedSearch !== undefined) {
+      listPost(selectedCommunity, debouncedSearch);
+    }
+  }, [debouncedSearch]);
+
   return (
     <main>
-      <Header menu="OurBlog" user={user} />
+      {loadingPost && <Loader />}
+      <Header menu="Home" user={user} />
       <div className="p-[20px] pt-[98px] flex">
         <div className="max-md:hidden w-2/12">
-          <MainMenu menu="OurBlog" desktop />
+          <MainMenu menu="Home" desktop />
         </div>
         <div className="md:w-8/12 max-md:w-full">
           <div>
-            <form className="flex">
-              {/* <button
-                    className={focusSearch ? "hidden" : ""}
-                    type="button"
-                    onClick={() => setFocusSearch(true)}
-                  >
-                    <MagnifyingGlassIcon className="size-6" />
-                  </button> */}
+            <div className="flex">
               <TextInput
                 placeholder="search"
                 transparentBackground
-                // onBlur={() => setFocusSearch(false)}
+                onChange={(event) => setSearch(event.target.value)}
               />
               <div>
                 <CommunityDropdown
+                  title={selectedCommunity ?? "Community"}
                   selected={selectedCommunity}
                   openOptions={openCommunity}
                   onToggle={() => setOpenCommunity(!openCommunity)}
@@ -131,20 +174,23 @@ export default function OurBlog() {
                     } else {
                       setSelectedCommunity(e.target.innerHTML);
                     }
+                    setOpenCommunity(false);
                   }}
                 />
               </div>
-              <div className="max-md:w-1/3 md:w-1/4">
-                <Button
-                  label="Create+"
-                  confirm
-                  onClick={() => setOpenCreate(true)}
-                />
-              </div>
-            </form>
+              {user && (
+                <div className="max-md:w-1/3 md:w-1/4">
+                  <Button
+                    label="Create+"
+                    confirm
+                    onClick={() => setOpenCreate(true)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <div className="mt-[15px] rounded-lg bg-white p-[2px]">
-            {posts.map((post) => (
+            {posts?.map((post) => (
               <Post
                 key={post._id}
                 post={{
@@ -156,7 +202,7 @@ export default function OurBlog() {
                   user: post.user,
                   created_at: post.created_at,
                 }}
-                allowAction
+                allowAction={user !== undefined}
                 onUpdate={() => handleUpdatePost()}
                 onDelete={() => handleDeletePost()}
               />
@@ -164,7 +210,7 @@ export default function OurBlog() {
           </div>
           {openCreate && (
             <Modal title="Create Post" onClose={() => setOpenCreate(false)}>
-              <form>
+              <form action={createPost}>
                 <div className="mb-[10px] md:w-fit">
                   <CommunityDropdown
                     border
@@ -184,12 +230,16 @@ export default function OurBlog() {
                       } else {
                         setSelectedCommunityCreate(e.target.innerHTML);
                       }
+                      setOpenCommunityCreate(false);
                     }}
                   />
                 </div>
-                <TextInput placeholder="Title" />
+                <TextInput placeholder="Title" name="topic" />
                 <div className="mt-[10px]">
-                  <TextArea placeholder="What's on your mind..." />
+                  <TextArea
+                    placeholder="What's on your mind..."
+                    name="content"
+                  />
                 </div>
 
                 <div className="mt-[20px] md:flex md:justify-end">

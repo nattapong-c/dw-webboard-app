@@ -23,3 +23,10 @@ export interface PostPagination {
     total_page: number;
     total_item: number;
 }
+
+export interface PostDto {
+    topic: string,
+    content: string,
+    community: CommunityType,
+    user_id: string
+}

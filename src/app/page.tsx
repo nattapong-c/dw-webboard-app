@@ -15,63 +15,6 @@ import { User } from "@/typing/user";
 import { Utils } from "@/utils";
 import { useDebounce } from "@/utils/debounce";
 import { useEffect, useState } from "react";
-// import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-
-// const posts = [
-//   {
-//     _id: "1",
-//     topic: "The Big Short War",
-//     content:
-//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-//     community: "History",
-//     comment_count: 32,
-//     user: {
-//       username: "Wieee",
-//       picture:
-//         "https://scontent.fkdt3-1.fna.fbcdn.net/v/t39.30808-6/439895622_298237006662240_1963575465128457687_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF8hyEB2oU_QBcibnZMSY08wsJTGi0fVrjCwlMaLR9WuGe1HQ0-pj-8XvzMs_g7cGxWmOqpzZSqTYmexn05vC9K&_nc_ohc=cq_XMG_-LGkQ7kNvgEVycnA&_nc_ht=scontent.fkdt3-1.fna&oh=00_AYA0tvSunD8_T4kz0Yffmft2fLOJC_UAsPtwENdHek4XMw&oe=669B1FB7",
-//     },
-//     created_at: new Date("2024-03-09"),
-//   },
-//   {
-//     _id: "2",
-//     topic: "The Big Short War",
-//     content:
-//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-//     community: "History",
-//     comment_count: 32,
-//     user: {
-//       username: "Wieee",
-//       picture: "",
-//     },
-//     created_at: new Date("2024-03-09"),
-//   },
-//   {
-//     _id: "3",
-//     topic: "The Big Short War",
-//     content:
-//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-//     community: "History",
-//     comment_count: 32,
-//     user: {
-//       username: "Wieee",
-//       picture: "",
-//     },
-//     created_at: new Date("2024-03-09"),
-//   },
-//   {
-//     _id: "4",
-//     topic: "The Big Short War",
-//     content:
-//       "Lorem ipsum dolor sit amet consectetur. Purus cursus vel est a pretium quam imperdiet. Tristique auctor sed semper nibh odio iaculis sed aliquet. Amet mollis eget morbi feugiat mi risus eu. Tortor sed sagittis convallis auctor.",
-//     community: "Exercise",
-//     comment_count: 32,
-//     user: {
-//       username: "Wieee",
-//       picture: "",
-//     },
-//     created_at: new Date("2024-03-09"),
-//   },
-// ];
 
 export default function Home() {
   const [openCommunity, setOpenCommunity] = useState(false);
@@ -81,7 +24,6 @@ export default function Home() {
     useState(undefined);
   const [openCreate, setOpenCreate] = useState(false);
   const [search, setSearch] = useState("");
-  // const [focusSearch, setFocusSearch] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [posts, setPost] = useState<PostType[]>([]);
   const [loadingPost, setLoadingPost] = useState(false);
@@ -117,6 +59,31 @@ export default function Home() {
     setLoadingPost(false);
   };
 
+  const createPost = async (formData: FormData) => {
+    setLoadingPost(true);
+    const topic = formData.get("topic") as string;
+    const content = formData.get("content") as string;
+
+    if (!selectedCommunityCreate) {
+      return "";
+    }
+    await PostService.create(
+      {
+        topic,
+        content,
+        community: selectedCommunityCreate,
+        user_id: user?._id || "",
+      },
+      localStorage.getItem("x-access") || ""
+    );
+
+    setLoadingPost(false);
+    setOpenCreate(false);
+    setOpenCommunityCreate(false);
+    setSelectedCommunityCreate(undefined);
+    await listPost(selectedCommunity, search);
+  };
+
   useEffect(() => {
     getMe();
     listPost();
@@ -127,13 +94,14 @@ export default function Home() {
   }, [selectedCommunity]);
 
   useEffect(() => {
-    if (debouncedSearch) {
+    if (debouncedSearch !== undefined) {
       listPost(selectedCommunity, debouncedSearch);
     }
   }, [debouncedSearch]);
 
   return (
     <main>
+      {loadingPost && <Loader />}
       <Header menu="Home" user={user} />
       <div className="p-[20px] pt-[98px] flex">
         <div className="max-md:hidden w-2/12">
@@ -142,13 +110,6 @@ export default function Home() {
         <div className="md:w-8/12 max-md:w-full">
           <div>
             <div className="flex">
-              {/* <button
-                className={focusSearch ? "hidden" : ""}
-                type="button"
-                onClick={() => setFocusSearch(true)}
-              >
-                <MagnifyingGlassIcon className="size-6" />
-              </button> */}
               <TextInput
                 placeholder="search"
                 transparentBackground
@@ -156,6 +117,7 @@ export default function Home() {
               />
               <div>
                 <CommunityDropdown
+                  title={selectedCommunity ?? "Community"}
                   selected={selectedCommunity}
                   openOptions={openCommunity}
                   onToggle={() => setOpenCommunity(!openCommunity)}
@@ -165,6 +127,7 @@ export default function Home() {
                     } else {
                       setSelectedCommunity(e.target.innerHTML);
                     }
+                    setOpenCommunity(false);
                   }}
                 />
               </div>
@@ -180,7 +143,6 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-[15px] rounded-lg bg-white p-[2px]">
-            {loadingPost && <Loader />}
             {posts?.map((post) => (
               <Post
                 key={post._id}
@@ -198,7 +160,7 @@ export default function Home() {
           </div>
           {openCreate && (
             <Modal title="Create Post" onClose={() => setOpenCreate(false)}>
-              <form>
+              <form action={createPost}>
                 <div className="mb-[10px] md:w-fit">
                   <CommunityDropdown
                     border
@@ -218,12 +180,16 @@ export default function Home() {
                       } else {
                         setSelectedCommunityCreate(e.target.innerHTML);
                       }
+                      setOpenCommunityCreate(false);
                     }}
                   />
                 </div>
-                <TextInput placeholder="Title" />
+                <TextInput placeholder="Title" name="topic" />
                 <div className="mt-[10px]">
-                  <TextArea placeholder="What's on your mind..." />
+                  <TextArea
+                    placeholder="What's on your mind..."
+                    name="content"
+                  />
                 </div>
 
                 <div className="mt-[20px] md:flex md:justify-end">
