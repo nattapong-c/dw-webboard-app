@@ -35,6 +35,7 @@ build version
 
 - axios - request backend services
 - dayjs - convert date to proper format
+- tailwindcss - css framework
 - @heroicons/react - icon package
 - @tailwindcss/line-clamp - tailwind plugin for truncating text
 
