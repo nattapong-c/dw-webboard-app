@@ -24,6 +24,25 @@ export const create = async (payload: CommentDto, token: string) => {
     }
 }
 
+export const update = async (id: string, payload: CommentDto, token: string) => {
+    try {
+        const schema = z.object({
+            message: z.string().trim().min(1, { message: "required message." }),
+            post_id: z.string(),
+        });
+
+        schema.parse({ ...payload })
+
+        await axios.put(`${process.env.NEXT_PUBLIC_SERVICE_URL}/comment/${id}`, payload, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    } catch (error) {
+        throw new Error(responseError(error));
+    }
+}
+
 export const deleteComment = async (id: string, token: string) => {
     try {
         await axios.delete(`${process.env.NEXT_PUBLIC_SERVICE_URL}/comment/${id}`, {

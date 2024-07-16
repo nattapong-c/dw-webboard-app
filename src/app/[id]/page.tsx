@@ -9,6 +9,7 @@ import Post from "@/components/post/Post";
 import Header from "@/layouts/header/Header";
 import MainMenu from "@/layouts/menu/Menu";
 import { Comment as CommentService, Post as PostService } from "@/services";
+import { Comment as CommentType } from "@/typing/comment";
 import { CommunityType, Post as PostType } from "@/typing/post";
 import { User } from "@/typing/user";
 import { Utils } from "@/utils";
@@ -27,6 +28,16 @@ export default function PostDetail() {
   const [post, setPost] = useState<PostType | undefined>(undefined);
   const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
+  const [openDelete, setOpenDelete] = useState(false);
+  const [commentDelete, setCommentDelete] = useState<string | undefined>(
+    undefined
+  );
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [formDataUpdate, setFormDataUpdate] = useState({
+    id: "",
+    message: "",
+    post_id: "",
+  });
 
   const params = useParams<{ id: string }>();
 
@@ -41,15 +52,23 @@ export default function PostDetail() {
     setLoadingPost(false);
   };
 
-  const deleteComment = async (commentId: string) => {
-    setLoadingPost(true);
-    try {
-      await CommentService.deleteComment(commentId, token);
-    } catch (error: any) {
-      enqueueToast({ content: error.message, type: "error" });
+  const openDeletePost = (commentId: string) => {
+    setOpenDelete(true);
+    setCommentDelete(commentId);
+  };
+
+  const handleDeletePost = async () => {
+    if (commentDelete) {
+      setLoadingPost(true);
+      try {
+        await CommentService.deleteComment(commentDelete, token);
+        setOpenDelete(false);
+      } catch (error: any) {
+        enqueueToast({ content: error.message, type: "error" });
+      }
+      setLoadingPost(false);
+      await getPost();
     }
-    setLoadingPost(false);
-    await getPost();
   };
 
   useEffect(() => {
@@ -99,6 +118,47 @@ export default function PostDetail() {
     await handleCreateComment(formData);
     setLoadingPost(false);
     setMessage("");
+  };
+
+  const openUpdateComment = (comment: CommentType) => {
+    setOpenUpdate(true);
+    setFormDataUpdate({
+      id: comment._id,
+      message: comment.message,
+      post_id: comment.post_id,
+    });
+  };
+
+  const onCloseUpdate = () => {
+    setOpenUpdate(false);
+    setLoadingPost(false);
+  };
+
+  const onChangeComment = (event: any) => {
+    setFormDataUpdate({
+      ...formDataUpdate,
+      message: event.target.value,
+    });
+  };
+
+  const handleUpdateComment = async (formData: FormData) => {
+    const message = formData.get("message") as string;
+    console.log(formDataUpdate);
+    try {
+      setLoadingPost(true);
+      await CommentService.update(
+        formDataUpdate.id,
+        {
+          message,
+          post_id: formDataUpdate.post_id,
+        },
+        token
+      );
+      onCloseUpdate();
+      await getPost();
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
+    }
   };
 
   return (
@@ -212,7 +272,8 @@ export default function PostDetail() {
                 <Comment
                   key={comment._id}
                   comment={comment}
-                  onDelete={() => deleteComment(comment._id)}
+                  onUpdate={() => openUpdateComment(comment)}
+                  onDelete={() => openDeletePost(comment._id)}
                   allowAction={user?._id === comment.user._id}
                 />
               ))}
@@ -220,6 +281,59 @@ export default function PostDetail() {
           )}
         </div>
       </div>
+      {openUpdate && (
+        <Modal title="Edit Comment" onClose={() => onCloseUpdate()}>
+          <form action={handleUpdateComment}>
+            <div>
+              <TextArea
+                placeholder="What's on your mind..."
+                name="message"
+                value={formDataUpdate.message}
+                onChange={(event) => onChangeComment(event)}
+              />
+            </div>
+
+            <div className="mt-[20px] md:flex md:justify-end">
+              <div className="max-md:mb-[15px] md:mr-[10px]">
+                <Button
+                  label="Cancel"
+                  outline
+                  onClick={() => onCloseUpdate()}
+                />
+              </div>
+              <div>
+                <Button label="Confirm" confirm submit />
+              </div>
+            </div>
+          </form>
+        </Modal>
+      )}
+      {openDelete && (
+        <Modal
+          title="Please comfirm if you wish to delete the comment"
+          titleCenter
+          subtitle="Are you sure you want to delete the comment? Once deleted, it cannot be recovered."
+          onClose={() => setOpenDelete(false)}
+        >
+          <div className="md:flex md:justify-end">
+            <div className="max-md:mb-[15px] md:order-last">
+              <Button
+                label="Delete"
+                submit
+                danger
+                onClick={() => handleDeletePost()}
+              />
+            </div>
+            <div className="md:mr-[10px]">
+              <Button
+                label="Cancel"
+                outline
+                onClick={() => setOpenDelete(false)}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
     </main>
   );
 }
