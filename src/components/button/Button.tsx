@@ -29,14 +29,12 @@ export default function Button(props: ButtonProp) {
   }
 
   return (
-    <>
-      <button
-        type={props.submit ? "submit" : "button"}
-        className={classes}
-        onClick={props.onClick ? props.onClick : undefined}
-      >
-        {props.label}
-      </button>
-    </>
+    <button
+      type={props.submit ? "submit" : "button"}
+      className={classes}
+      onClick={props.onClick ? props.onClick : undefined}
+    >
+      {props.label}
+    </button>
   );
 }
