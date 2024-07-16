@@ -14,6 +14,8 @@ interface MenuProp {
   menu: keyof typeof MenuEnum;
   desktop?: boolean;
   user?: User;
+
+  onLogout?: () => void;
 }
 
 export default function MainMenu(props: MenuProp) {
@@ -46,22 +48,29 @@ export default function MainMenu(props: MenuProp) {
             Home
           </a>
         </li>
-        <li className="pt-[10px]">
-          <a
-            className={`text-sm hover:font-bold flex ${
-              props.desktop ? "text-black" : "text-white"
-            } ${props.menu === "OurBlog" ? "font-bold" : ""}`}
-            href="/our-blog"
-          >
-            <PencilSquareIcon
-              className={`size-6 ${
+        {props.user && (
+          <li className="pt-[10px]">
+            <a
+              className={`text-sm hover:font-bold flex ${
                 props.desktop ? "text-black" : "text-white"
-              } mr-[15px]`}
-            />
-            Our Blog
-          </a>
-        </li>
+              } ${props.menu === "OurBlog" ? "font-bold" : ""}`}
+              href="/our-blog"
+            >
+              <PencilSquareIcon
+                className={`size-6 ${
+                  props.desktop ? "text-black" : "text-white"
+                } mr-[15px]`}
+              />
+              Our Blog
+            </a>
+          </li>
+        )}
       </ul>
+      {props.user && (
+        <div className="mt-[30px]">
+          <Button label="Sign out" danger outline onClick={props.onLogout} />
+        </div>
+      )}
     </>
   );
 }

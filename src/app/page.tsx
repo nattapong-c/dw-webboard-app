@@ -168,13 +168,15 @@ export default function Home() {
                   }}
                 />
               </div>
-              <div className="max-md:w-1/3 md:w-1/4">
-                <Button
-                  label="Create+"
-                  confirm
-                  onClick={() => setOpenCreate(true)}
-                />
-              </div>
+              {user && (
+                <div className="max-md:w-1/3 md:w-1/4">
+                  <Button
+                    label="Create+"
+                    confirm
+                    onClick={() => setOpenCreate(true)}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-[15px] rounded-lg bg-white p-[2px]">

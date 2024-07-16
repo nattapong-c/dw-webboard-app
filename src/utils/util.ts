@@ -10,3 +10,10 @@ export const getUserLocal = (): User => {
         picture
     }
 }
+
+export const removeUserLocal = () => {
+    localStorage.removeItem("x-access");
+    localStorage.removeItem("x-user-id");
+    localStorage.removeItem("x-user-username");
+    localStorage.removeItem("x-user-picture");
+}

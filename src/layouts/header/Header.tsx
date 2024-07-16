@@ -6,6 +6,8 @@ import { ArrowRightIcon, Bars3Icon } from "@heroicons/react/24/solid";
 import MainMenu from "../menu/Menu";
 import { User } from "@/typing/user";
 import UserLogin from "@/components/user/UserLogin";
+import { Utils } from "@/utils";
+import { useRouter } from "next/navigation";
 
 enum Menu {
   "Home",
@@ -18,7 +20,12 @@ interface HeaderProp {
 
 export default function Header(props: HeaderProp) {
   const [openMenu, setOpenMenu] = useState(false);
-  // TODO add logout
+  const { push } = useRouter();
+  const logout = () => {
+    Utils.removeUserLocal();
+    push("/login");
+  };
+
   return (
     <>
       <div className="bg-main-color py-[15px] px-[20px] flex justify-between fixed w-full z-50">
@@ -30,7 +37,17 @@ export default function Header(props: HeaderProp) {
         <div>
           <div className="max-md:hidden">
             {props.user ? (
-              <UserLogin user={props.user} />
+              <div className="flex">
+                <UserLogin user={props.user} />
+                <div className="ml-[10px]">
+                  <Button
+                    label="Sign out"
+                    onClick={() => logout()}
+                    outline
+                    danger
+                  />
+                </div>
+              </div>
             ) : (
               <a href="/login">
                 <Button label="Sign in" confirm />
@@ -55,7 +72,11 @@ export default function Header(props: HeaderProp) {
             <button className="mb-[40px]" onClick={() => setOpenMenu(false)}>
               <ArrowRightIcon className="size-6 text-white" />
             </button>
-            <MainMenu menu={props.menu} user={props.user} />
+            <MainMenu
+              menu={props.menu}
+              user={props.user}
+              onLogout={() => logout()}
+            />
           </div>
         </div>
       </div>
