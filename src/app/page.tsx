@@ -30,33 +30,33 @@ export default function Home() {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [posts, setPost] = useState<PostType[]>([]);
   const [loadingPost, setLoadingPost] = useState(true);
-  const [validate, setValidate] = useState<any>({});
 
   const debouncedSearch = useDebounce(search, 1500);
 
   const getMe = async () => {
     const userLocal = Utils.getUserLocal();
+
     if (userLocal._id) {
       setUser(userLocal);
     } else {
       const token = localStorage.getItem("x-access");
       if (token) {
         try {
-          const user = await Auth.getMe(token);
-          if (user?._id) {
-            localStorage.setItem("x-user-id", user._id);
+          const me = await Auth.getMe(token);
+          if (me?._id) {
+            localStorage.setItem("x-user-id", me._id);
           }
-          if (user?.username) {
-            localStorage.setItem("x-user-username", user?.username);
+          if (me?.username) {
+            localStorage.setItem("x-user-username", me?.username);
           }
-          if (user?.picture) {
-            localStorage.setItem("x-user-picture", user.picture);
+          if (me?.picture) {
+            localStorage.setItem("x-user-picture", me.picture);
           }
+
+          setUser(me);
         } catch (error: any) {
           enqueueToast({ content: error.message, type: "error" });
         }
-
-        setUser(user);
       }
     }
   };
@@ -205,28 +205,13 @@ export default function Home() {
                       setOpenCommunityCreate(false);
                     }}
                   />
-                  {validate?.community && (
-                    <p className="text-danger-color text-[12px]">
-                      {validate.community}
-                    </p>
-                  )}
                 </div>
                 <TextInput placeholder="Title" name="topic" />
-                {validate?.topic && (
-                  <p className="text-danger-color text-[12px]">
-                    {validate.topic}
-                  </p>
-                )}
                 <div className="mt-[10px]">
                   <TextArea
                     placeholder="What's on your mind..."
                     name="content"
                   />
-                  {validate?.content && (
-                    <p className="text-danger-color text-[12px]">
-                      {validate.content}
-                    </p>
-                  )}
                 </div>
 
                 <div className="mt-[20px] md:flex md:justify-end">
