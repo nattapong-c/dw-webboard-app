@@ -22,6 +22,10 @@ export default function OurBlog() {
   const [openCommunityCreate, setOpenCommunityCreate] = useState(false);
   const [selectedCommunityCreate, setSelectedCommunityCreate] =
     useState(undefined);
+  const [openCommunityUpdate, setOpenCommunityUpdate] = useState(false);
+  const [selectedCommunityUpdate, setSelectedCommunityUpdate] = useState<
+    CommunityType | undefined
+  >(undefined);
   const [openCreate, setOpenCreate] = useState(false);
   const [search, setSearch] = useState("");
   const [openUpdate, setOpenUpdate] = useState(false);
@@ -29,24 +33,70 @@ export default function OurBlog() {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [loadingPost, setLoadingPost] = useState(false);
   const [posts, setPost] = useState<PostType[]>([]);
+  const [formDataUpdate, setFormDataUpdate] = useState({
+    id: "",
+    topic: "",
+    content: "",
+  });
+
   const debouncedSearch = useDebounce(search, 1500);
 
-  const handleUpdatePost = () => {
+  const openUpdatePost = (post: PostType) => {
     setOpenUpdate(true);
-    // TODO fill form
-    // TODO reset form
+    setSelectedCommunityUpdate(post.community);
+    setFormDataUpdate({
+      id: post._id,
+      topic: post.topic,
+      content: post.content,
+    });
+  };
+
+  const onChangeTopic = (event: any) => {
+    setFormDataUpdate({
+      ...formDataUpdate,
+      topic: event.target.value,
+    });
+  };
+
+  const onChangeContent = (event: any) => {
+    setFormDataUpdate({
+      ...formDataUpdate,
+      content: event.target.value,
+    });
+  };
+
+  const onSelectCommunity = (event: any) => {
+    if (event.target.innerHTML.includes(selectedCommunityUpdate)) {
+      setSelectedCommunityUpdate(undefined);
+    } else {
+      setSelectedCommunityUpdate(event.target.innerHTML);
+    }
+    setOpenCommunityUpdate(false);
+  };
+
+  const handleUpdatePost = async (formData: FormData) => {
+    setLoadingPost(true);
+    const topic = formData.get("topic") as string;
+    const content = formData.get("content") as string;
+
+    await PostService.update(
+      formDataUpdate.id,
+      {
+        topic,
+        content,
+        community: selectedCommunityUpdate as CommunityType,
+      },
+      localStorage.getItem("x-access") || ""
+    );
+
+    setLoadingPost(false);
+    setOpenUpdate(false);
+    await listPost(selectedCommunity, search);
   };
 
   const handleDeletePost = () => {
     setOpenDelete(true);
   };
-
-  useEffect(() => {
-    const userLocal = Utils.getUserLocal();
-    if (userLocal._id) {
-      setUser(userLocal);
-    }
-  }, []);
 
   const listPost = async (community?: string, topic?: string) => {
     setLoadingPost(true);
@@ -61,6 +111,7 @@ export default function OurBlog() {
     const content = formData.get("content") as string;
 
     if (!selectedCommunityCreate) {
+      // TODO handle validate
       return "";
     }
     await PostService.create(
@@ -68,7 +119,6 @@ export default function OurBlog() {
         topic,
         content,
         community: selectedCommunityCreate,
-        user_id: user?._id || "",
       },
       localStorage.getItem("x-access") || ""
     );
@@ -79,6 +129,15 @@ export default function OurBlog() {
     setSelectedCommunityCreate(undefined);
     await listPost(selectedCommunity, search);
   };
+
+  useEffect(() => {
+    setLoadingPost(true);
+    const userLocal = Utils.getUserLocal();
+    if (userLocal._id) {
+      setUser(userLocal);
+    }
+    setLoadingPost(false);
+  }, []);
 
   useEffect(() => {
     listPost(selectedCommunity, search);
@@ -93,10 +152,10 @@ export default function OurBlog() {
   return (
     <main>
       {loadingPost && <Loader />}
-      <Header menu="Home" user={user} />
+      <Header menu="OurBlog" user={user} />
       <div className="p-[20px] pt-[98px] flex">
         <div className="max-md:hidden w-2/12">
-          <MainMenu menu="Home" desktop />
+          <MainMenu menu="OurBlog" desktop user={user} />
         </div>
         <div className="md:w-8/12 max-md:w-full">
           <div>
@@ -147,7 +206,7 @@ export default function OurBlog() {
                   created_at: post.created_at,
                 }}
                 allowAction={user !== undefined}
-                onUpdate={() => handleUpdatePost()}
+                onUpdate={() => openUpdatePost(post)}
                 onDelete={() => handleDeletePost()}
               />
             ))}
@@ -203,32 +262,34 @@ export default function OurBlog() {
           )}
           {openUpdate && (
             <Modal title="Edit Post" onClose={() => setOpenUpdate(false)}>
-              <form>
+              <form action={handleUpdatePost}>
                 <div className="mb-[10px] md:w-fit">
                   <CommunityDropdown
                     border
-                    title={selectedCommunityCreate ?? "Choose a community"}
+                    title={selectedCommunityUpdate ?? "Choose a community"}
                     titleCenter
                     createMode
-                    selected={selectedCommunityCreate}
-                    openOptions={openCommunityCreate}
+                    selected={selectedCommunityUpdate}
+                    openOptions={openCommunityUpdate}
                     onToggle={() =>
-                      setOpenCommunityCreate(!openCommunityCreate)
+                      setOpenCommunityUpdate(!openCommunityUpdate)
                     }
-                    onSelect={(e) => {
-                      if (
-                        e.target.innerHTML.includes(selectedCommunityCreate)
-                      ) {
-                        setSelectedCommunityCreate(undefined);
-                      } else {
-                        setSelectedCommunityCreate(e.target.innerHTML);
-                      }
-                    }}
+                    onSelect={(e) => onSelectCommunity(e)}
                   />
                 </div>
-                <TextInput placeholder="Title" />
+                <TextInput
+                  placeholder="Title"
+                  name="topic"
+                  value={formDataUpdate.topic}
+                  onChange={(event) => onChangeTopic(event)}
+                />
                 <div className="mt-[10px]">
-                  <TextArea placeholder="What's on your mind..." />
+                  <TextArea
+                    placeholder="What's on your mind..."
+                    name="content"
+                    value={formDataUpdate.content}
+                    onChange={(event) => onChangeContent(event)}
+                  />
                 </div>
 
                 <div className="mt-[20px] md:flex md:justify-end">

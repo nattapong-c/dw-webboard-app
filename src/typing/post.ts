@@ -28,5 +28,4 @@ export interface PostDto {
     topic: string,
     content: string,
     community: CommunityType,
-    user_id: string
 }

@@ -62,7 +62,7 @@ export default function PostDetail() {
       <Header menu="Home" user={user} />
       <div className="pt-[74px] flex bg-white">
         <div className="p-[20px] max-md:hidden w-1/4 bg-main-gray">
-          <MainMenu menu="Home" desktop />
+          <MainMenu menu="Home" desktop user={user} />
         </div>
         <div className="h-full bg-white py-[20px]">
           <div className="pl-[20px] mb-[40px]">

@@ -66,7 +66,7 @@ export default function MainMenu(props: MenuProp) {
           </li>
         )}
       </ul>
-      {props.user && (
+      {props.user && !props.desktop && (
         <div className="mt-[30px]">
           <Button label="Sign out" danger outline onClick={props.onLogout} />
         </div>

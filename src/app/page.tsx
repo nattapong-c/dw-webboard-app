@@ -65,6 +65,7 @@ export default function Home() {
     const content = formData.get("content") as string;
 
     if (!selectedCommunityCreate) {
+      // TODO handle validate
       return "";
     }
     await PostService.create(
@@ -72,7 +73,6 @@ export default function Home() {
         topic,
         content,
         community: selectedCommunityCreate,
-        user_id: user?._id || "",
       },
       localStorage.getItem("x-access") || ""
     );
@@ -85,8 +85,9 @@ export default function Home() {
   };
 
   useEffect(() => {
+    setLoadingPost(true);
     getMe();
-    listPost();
+    setLoadingPost(false);
   }, []);
 
   useEffect(() => {
@@ -105,7 +106,7 @@ export default function Home() {
       <Header menu="Home" user={user} />
       <div className="p-[20px] pt-[98px] flex">
         <div className="max-md:hidden w-2/12">
-          <MainMenu menu="Home" desktop />
+          <MainMenu menu="Home" desktop user={user} />
         </div>
         <div className="md:w-8/12 max-md:w-full">
           <div>

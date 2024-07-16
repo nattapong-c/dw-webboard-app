@@ -44,3 +44,16 @@ export const create = async (payload: PostDto, token: string) => {
         // TODO handle error
     }
 }
+
+export const update = async (id: string, payload: PostDto, token: string) => {
+    try {
+        await axios.put(`${process.env.NEXT_PUBLIC_SERVICE_URL}/post/${id}`, payload, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    } catch (error) {
+        console.log((error as AxiosError).response?.data)
+        // TODO handle error
+    }
+}
