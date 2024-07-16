@@ -14,7 +14,7 @@ To run this project, you will need to add the following environment variables to
 
 see example in .env.example file
 
-`NEXT_PUBLIC_SERVICE_URL` backend service url
+`NEXT_PUBLIC_SERVICE_URL` backend service url (Ex. http://localhost:3001/api/v1)
 
 ## Start Application
 
@@ -27,8 +27,8 @@ develop version
 build version
 
 ```
-    yarn build
-    yarn start
+  yarn build
+  yarn start
 ```
 
 ## Packages in project
