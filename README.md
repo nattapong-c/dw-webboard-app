@@ -38,6 +38,8 @@ build version
 - tailwindcss - css framework
 - @heroicons/react - icon package
 - @tailwindcss/line-clamp - tailwind plugin for truncating text
+- tw-noti - notification for tailwind
+- zod - lib for validate data
 
 ## Folder Structure
 
