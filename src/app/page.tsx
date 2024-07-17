@@ -29,6 +29,8 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [user, setUser] = useState<User | undefined>(undefined);
   const [posts, setPost] = useState<PostType[]>([]);
+  const [postPage, setPostPage] = useState(1);
+  const [hideLoadMore, setHideLoadMore] = useState(false);
   const [loadingPost, setLoadingPost] = useState(true);
 
   const debouncedSearch = useDebounce(search, 1500);
@@ -61,11 +63,19 @@ export default function Home() {
     }
   };
 
-  const listPost = async (community?: string, topic?: string) => {
+  const listPost = async (page: number, community?: string, topic?: string) => {
     setLoadingPost(true);
     try {
-      const results = await PostService.list(community, topic);
-      setPost(results || []);
+      const results = await PostService.list(page, community, topic);
+      if (results) {
+        if (page === 1) {
+          setPost(results.posts);
+        } else {
+          setPost([...posts, ...results.posts]);
+        }
+      }
+      setHideLoadMore(page === results.total_page);
+      setPostPage(page);
     } catch (error: any) {
       enqueueToast({ content: error.message, type: "error" });
     }
@@ -94,7 +104,7 @@ export default function Home() {
       onCloseCreate();
       setOpenCommunityCreate(false);
       setSelectedCommunityCreate(undefined);
-      await listPost(selectedCommunity, search);
+      await listPost(1, selectedCommunity, search);
     } catch (error: any) {
       enqueueToast({ content: error.message, type: "error" });
     }
@@ -107,12 +117,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    listPost(selectedCommunity, search);
+    listPost(1, selectedCommunity, search);
   }, [selectedCommunity]);
 
   useEffect(() => {
     if (debouncedSearch !== undefined) {
-      listPost(selectedCommunity, debouncedSearch);
+      listPost(1, selectedCommunity, debouncedSearch);
     }
   }, [debouncedSearch]);
 
@@ -180,6 +190,19 @@ export default function Home() {
               />
             ))}
           </div>
+          {!hideLoadMore && (
+            <div className="mt-[15px] flex justify-center">
+              <div className="w-[200px]">
+                <Button
+                  label="Load more"
+                  confirm
+                  onClick={() =>
+                    listPost(postPage + 1, selectedCommunity, search)
+                  }
+                />
+              </div>
+            </div>
+          )}
           {openCreate && (
             <Modal title="Create Post" onClose={() => onCloseCreate()}>
               <form action={createPost}>

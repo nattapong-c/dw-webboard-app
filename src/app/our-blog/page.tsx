@@ -44,6 +44,8 @@ export default function OurBlog() {
   });
   const [token, setToken] = useState("");
   const [postDelete, setPostDelete] = useState<PostType | undefined>(undefined);
+  const [postPage, setPostPage] = useState(1);
+  const [hideLoadMore, setHideLoadMore] = useState(false);
 
   const debouncedSearch = useDebounce(search, 1500);
 
@@ -106,7 +108,7 @@ export default function OurBlog() {
         token
       );
       onCloseUpdate();
-      await listPost(selectedCommunity, search);
+      await listPost(1, selectedCommunity, search);
     } catch (error: any) {
       enqueueToast({ content: error.message, type: "error" });
     }
@@ -127,19 +129,25 @@ export default function OurBlog() {
       }
       setLoadingPost(false);
       setOpenDelete(false);
-      await listPost(selectedCommunity, search);
+      await listPost(1, selectedCommunity, search);
     }
   };
 
-  const listPost = async (community?: string, topic?: string) => {
+  const listPost = async (page: number, community?: string, topic?: string) => {
     setLoadingPost(true);
-    if (token) {
-      try {
-        const results = await PostService.list(community, topic, token, true);
-        setPost(results || []);
-      } catch (error: any) {
-        enqueueToast({ content: error.message, type: "error" });
+    try {
+      const results = await PostService.list(page, community, topic);
+      if (results) {
+        if (page === 1) {
+          setPost(results.posts);
+        } else {
+          setPost([...posts, ...results.posts]);
+        }
       }
+      setHideLoadMore(page === results.total_page);
+      setPostPage(page);
+    } catch (error: any) {
+      enqueueToast({ content: error.message, type: "error" });
     }
     setLoadingPost(false);
   };
@@ -161,7 +169,7 @@ export default function OurBlog() {
       onCloseCreate();
       setOpenCommunityCreate(false);
       setSelectedCommunityCreate(undefined);
-      await listPost(selectedCommunity, search);
+      await listPost(1, selectedCommunity, search);
     } catch (error: any) {
       enqueueToast({ content: error.message, type: "error" });
     }
@@ -180,16 +188,16 @@ export default function OurBlog() {
   }, []);
 
   useEffect(() => {
-    listPost(selectedCommunity, search);
+    listPost(1, selectedCommunity, search);
   }, [token]);
 
   useEffect(() => {
-    listPost(selectedCommunity, search);
+    listPost(1, selectedCommunity, search);
   }, [selectedCommunity]);
 
   useEffect(() => {
     if (debouncedSearch !== undefined) {
-      listPost(selectedCommunity, debouncedSearch);
+      listPost(1, selectedCommunity, debouncedSearch);
     }
   }, [debouncedSearch]);
 
@@ -260,6 +268,19 @@ export default function OurBlog() {
               />
             ))}
           </div>
+          {!hideLoadMore && (
+            <div className="mt-[15px] flex justify-center">
+              <div className="w-[200px]">
+                <Button
+                  label="Load more"
+                  confirm
+                  onClick={() =>
+                    listPost(postPage + 1, selectedCommunity, search)
+                  }
+                />
+              </div>
+            </div>
+          )}
           {openCreate && (
             <Modal title="Create Post" onClose={() => onCloseCreate()}>
               <form action={createPost}>

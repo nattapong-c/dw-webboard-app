@@ -4,11 +4,11 @@ import { responseError } from "@/utils/error";
 import axios, { AxiosResponse } from "axios"
 import { z } from 'zod';
 
-export const list = async (community?: string, topic?: string, token?: string, isPrivate?: boolean): Promise<Post[] | undefined> => {
+export const list = async (page: number, community?: string, topic?: string, token?: string, isPrivate?: boolean): Promise<PostPagination> => {
     try {
         const params: any = {
-            page: 1,
-            size: 600
+            page,
+            size: 5
         };
         if (community) {
             params['community'] = community;
@@ -30,7 +30,7 @@ export const list = async (community?: string, topic?: string, token?: string, i
             headers
         });
 
-        return result.data.data.posts;
+        return result.data.data;
     } catch (error) {
         throw new Error(responseError(error));
     }
