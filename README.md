@@ -56,6 +56,12 @@ build version
   └── README.md
 ```
 
+## Extra Features
+
+- Infite load post - load 5 posts each click load more button
+- Sign out - Log out website
+- Skip sign in
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
