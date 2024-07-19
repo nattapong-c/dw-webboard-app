@@ -58,7 +58,7 @@ build version
 
 ## Extra Features
 
-- Infite load post - load 5 posts each click load more button
+- Infinite load post - load 5 posts each click load more button
 - Sign out - Log out website
 - Skip sign in
 
