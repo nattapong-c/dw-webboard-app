@@ -136,7 +136,13 @@ export default function OurBlog() {
   const listPost = async (page: number, community?: string, topic?: string) => {
     setLoadingPost(true);
     try {
-      const results = await PostService.list(page, community, topic);
+      const results = await PostService.list(
+        page,
+        community,
+        topic,
+        token,
+        true
+      );
       if (results) {
         if (page === 1) {
           setPost(results.posts);
@@ -188,16 +194,22 @@ export default function OurBlog() {
   }, []);
 
   useEffect(() => {
-    listPost(1, selectedCommunity, search);
+    if (token) {
+      listPost(1, selectedCommunity, search);
+    }
   }, [token]);
 
   useEffect(() => {
-    listPost(1, selectedCommunity, search);
+    if (token) {
+      listPost(1, selectedCommunity, search);
+    }
   }, [selectedCommunity]);
 
   useEffect(() => {
-    if (debouncedSearch !== undefined) {
-      listPost(1, selectedCommunity, debouncedSearch);
+    if (token) {
+      if (debouncedSearch !== undefined) {
+        listPost(1, selectedCommunity, debouncedSearch);
+      }
     }
   }, [debouncedSearch]);
 
